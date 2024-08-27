@@ -164,6 +164,20 @@ function Page() {
                     <MyCard title='Adjustment Hours' value={`${adjustmentHours} hours`} />
                 </Col>
             </Row>
+            <Row className='mb-4'>
+                <Col>
+                    <Card>
+                        <Card.Body>
+                            <div className='d-flex align-items-center justify-content-center gap-3'>
+                                <MyItem title='Day complete' color='bg-success' />
+                                <MyItem title='Day short' color='bg-danger' />
+                                <MyItem title='Day complete with extra hour' color='bg-info' />
+                                <MyItem title='Day incomplete' color='bg-warning' />
+                            </div>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
             {/* month */}
             <Row className='mb-4'>
                 <Col>
@@ -210,6 +224,15 @@ function Page() {
 
 export default Page;
 
+
+const MyItem = ({ title, color }) => {
+    return (
+        <div className='d-flex align-items-center justify-content-center gap-1'>
+            <span className={`${color} d-inline-block rounded`} style={{ width: 25, height: 10 }}></span>
+            <span className='fw-bold' style={{ fontSize: "12px" }}>{title}</span>
+        </div>
+    )
+}
 
 const MyCard = ({ title, value }) => {
     return (
