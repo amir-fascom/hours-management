@@ -1,48 +1,38 @@
-// reducer.js
-
-import { Utils } from "../utils";
-
-export const ADD_ROW = 'ADD_ROW'
-export const REMOVE_ROW = 'REMOVE_ROW'
-export const INPUT_CHANGE = 'INPUT_CHANGE'
-export const TIME_IN = 'TIME_IN'
-export const TIME_OUT = 'TIME_OUT'
+// reducer/index.js
+export const HANDLE_EVENT = 'HANDLE_EVENT';
+export const INITIALIZE_EVENTS = 'INITIALIZE_EVENTS';
+export const CLEAR_EVENT = 'CLEAR_EVENT';
 
 export const initialState = {
-    formRows: [],
+    events: {}, // Store events as key-value pairs where the key is the date
 };
 
-export const formReducer = (state, action) => {
+export const appReducer = (state, action) => {
     switch (action.type) {
-        case ADD_ROW:
+        case HANDLE_EVENT:
+            const { date, event } = action.payload;
             return {
-                ...state, formRows: [...state.formRows, {
-                    id: Utils.generateId(),
-                    timeIn: '00:00',
-                    timeOut: '00:00'
-                }]
-            };
-        case REMOVE_ROW:
-            if (state.formRows.length === 1) {
-                return state
-            }
-            return { ...state, formRows: state.formRows.filter(x => x.id !== action.payload) };
-        case INPUT_CHANGE:
-            const formData = [...state.formRows]
-            const updatedFormData = formData.map(x => {
-                if (x.id === action.payload.id) {
-                    return {
-                        ...x,
-                        ...(action.payload.input === TIME_IN ? {
-                            timeIn: action.payload.value
-                        } : {
-                            timeOut: action.payload.value
-                        })
+                ...state,
+                events: {
+                    ...state.events,
+                    [date]: {
+                        ...state.events[date],
+                        ...event
                     }
                 }
-                return x
-            })
-            return { ...state, formRows: updatedFormData };
+            };
+        case CLEAR_EVENT:
+            const updatedEvents = { ...state.events };
+            delete updatedEvents[action.payload.date];
+            return {
+                ...state,
+                events: updatedEvents,
+            };
+        case INITIALIZE_EVENTS:
+            return {
+                ...state,
+                events: action.payload
+            };
         default:
             return state;
     }

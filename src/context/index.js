@@ -1,15 +1,32 @@
-// TodoContext.js
-import React, { createContext, useReducer } from 'react';
-import { formReducer, initialState } from '../reducer';
+// context/index.js
+import React, { createContext, useReducer, useEffect } from 'react';
+import { appReducer, initialState } from '../reducer';
 
-export const FormContext = createContext();
+export const AppContext = createContext();
 
-export const FormStateProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(formReducer, initialState);
+export const AppStateProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(appReducer, initialState);
+  // Load from localStorage when the app starts
+  useEffect(() => {
+    const savedEvents = localStorage.getItem('events');
+    if (savedEvents) {
+      dispatch({
+        type: 'INITIALIZE_EVENTS',
+        payload: JSON.parse(savedEvents)
+      });
+    }
+  }, []);
+
+  // Save to localStorage whenever the state changes
+  useEffect(() => {
+    if (state.events) {
+      localStorage.setItem('events', JSON.stringify(state.events));
+    }
+  }, [state.events]);
 
   return (
-    <FormContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{ state, dispatch }}>
       {children}
-    </FormContext.Provider>
+    </AppContext.Provider>
   );
 };

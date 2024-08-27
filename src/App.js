@@ -1,13 +1,13 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import FormPage from './screens/formPage';
-import { FormStateProvider } from './context';
+import Page from './screens/Page';
+import { AppStateProvider } from './context';
 
 function App() {
   return (
-    <FormStateProvider>
-      <FormPage />
-    </FormStateProvider>
+    <AppStateProvider>
+      <Page />
+    </AppStateProvider>
   );
 }
 
