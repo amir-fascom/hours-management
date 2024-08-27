@@ -10,14 +10,17 @@ export const initialState = {
 export const appReducer = (state, action) => {
     switch (action.type) {
         case HANDLE_EVENT:
-            const { date, event } = action.payload;
+            const { month, date, event } = action.payload;
             return {
                 ...state,
                 events: {
                     ...state.events,
-                    [date]: {
-                        ...state.events[date],
-                        ...event
+                    [month]: {
+                        ...state.events[month],
+                        [date]: {
+                            ...state.events[month]?.[date],
+                            ...event
+                        }
                     }
                 }
             };

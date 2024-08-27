@@ -4,27 +4,25 @@ import { AppContext } from '../context';
 import moment from 'moment';
 import { IconButton } from '../components';
 import { FaPen } from 'react-icons/fa';
-import { MdClose, MdKeyboardArrowLeft } from "react-icons/md";
+import { MdClose, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { Utils } from '../utils';
 import { CLEAR_EVENT, HANDLE_EVENT } from '../reducer';
 
-
 function Page() {
     const { state, dispatch } = useContext(AppContext);
-    const [currentMonth, setCurrentMonth] = useState(moment());
-    const year = moment().year();
+    const [currentMonth, setCurrentMonth] = useState(moment().date() >= 26 ? moment() : moment().subtract(1, 'month')); // Custom month logic
+    const monthKey = currentMonth.clone().add(1, 'month').format('MMMM-YYYY')
     const [calendar, setCalendar] = React.useState([]);
     const { events } = state
 
     useEffect(() => {
-        generateCalendar(currentMonth, year);
-    }, [currentMonth, year]);
+        generateCalendar(currentMonth);
+    }, [currentMonth]);
 
     const generateCalendar = (month) => {
-        const startOfMonth = month.clone().startOf('month');
-        const endOfMonth = month.clone().endOf('month');
+        const startOfMonth = month.clone().date(26);
+        const endOfMonth = month.clone().add(1, 'month').date(25);
 
-        // Adjust to start the week on Sunday
         let startDate = startOfMonth.clone().startOf('week');
         let endDate = endOfMonth.clone().endOf('week');
 
@@ -34,9 +32,10 @@ function Page() {
         // Generate weeks
         while (day.isBefore(endDate, 'day')) {
             const week = Array(7).fill(null).map(() => {
-                const dayClone = day.clone(); // Clone before incrementing
-                day.add(1, 'day'); // Increment the day after cloning
-                return dayClone;
+                const dayClone = day.clone();
+                const isInactive = dayClone.isBefore(startOfMonth, 'day') || dayClone.isAfter(endOfMonth, 'day');
+                day.add(1, 'day');
+                return { date: dayClone, isInactive };
             });
             calendarDays.push(week);
         }
@@ -44,24 +43,33 @@ function Page() {
         setCalendar(calendarDays);
     };
 
+
     const goToPreviousMonth = () => {
         setCurrentMonth(prevMonth => prevMonth.clone().subtract(1, 'month'));
     };
 
+    const goToNextMonth = () => {
+        setCurrentMonth(prevMonth => prevMonth.clone().add(1, 'month'));
+    };
+
     const handleTimeChange = (date, timeType, value) => {
         // Update the event in the state
-        const updatedEvent = { ...events[date], [timeType]: value };
+        const updatedEvent = { ...events?.[monthKey]?.[date], [timeType]: value };
 
         if (updatedEvent.inTime && updatedEvent.outTime) {
             const { hours, minutes } = getTimeDifference(updatedEvent.inTime, updatedEvent.outTime);
 
+            updatedEvent.totalTime = {
+                hours,
+                minutes
+            };
             // Determine if the hours should be counted as short or extra
             if (hours < 9) {
-                updatedEvent.shortHours = 1; // 1 hour short if total time is less than 9 hours
+                updatedEvent.shortHours = 9 - hours;
                 updatedEvent.extraHours = 0;
             } else if (hours > 9) {
                 updatedEvent.shortHours = 0;
-                updatedEvent.extraHours = 1; // 1 hour extra if total time is more than 9 hours
+                updatedEvent.extraHours = hours - 9;
             } else {
                 updatedEvent.shortHours = 0;
                 updatedEvent.extraHours = 0;
@@ -74,6 +82,7 @@ function Page() {
         dispatch({
             type: HANDLE_EVENT,
             payload: {
+                month: monthKey,
                 date,
                 event: updatedEvent,
             }
@@ -84,7 +93,7 @@ function Page() {
     const clearEvent = (date) => {
         dispatch({
             type: CLEAR_EVENT,
-            payload: { date }
+            payload: { month: monthKey, date }
         });
     };
 
@@ -109,9 +118,9 @@ function Page() {
         let totalExtraHours = 0;
         let adjustmentHours = 3;
 
-        Object.values(events).forEach(event => {
+        Object.values(events?.[monthKey] || {}).forEach(event => {
             if (event.inTime && event.outTime) {
-                const { hours, minutes } = getTimeDifference(event.inTime, event.outTime);
+                const { hours, minutes } = event?.totalTime || {};
 
                 // Aggregate total hours
                 totalHours.hours += hours;
@@ -128,6 +137,8 @@ function Page() {
                 totalExtraHours += event.extraHours || 0;
             }
         });
+
+        totalShortHours = totalShortHours > 0 ? (totalShortHours <= 3 ? 3 - totalShortHours : totalShortHours - 3) : 0
 
         adjustmentHours = totalShortHours > totalExtraHours ? (totalShortHours - totalExtraHours <= 3 ? (3 - (totalShortHours - totalExtraHours) || 3) : 0) : 3
 
@@ -161,16 +172,17 @@ function Page() {
                             <div className='d-flex align-items-center justify-content-center gap-2'>
                                 <IconButton onClick={goToPreviousMonth} title='Previous Month' icon={<MdKeyboardArrowLeft />} sx='border-0' />
                                 <h5 className='text-center mb-0 fw-bold fs-4'>
-
-                                    {currentMonth.format('MMMM YYYY')}</h5>
+                                    {currentMonth.clone().add(1, 'month').format('MMMM YYYY')}</h5>
+                                <IconButton onClick={goToNextMonth} title='Next Month' icon={<MdKeyboardArrowRight />} sx='border-0' />
                             </div>
                         </Card.Body>
                     </Card>
                 </Col>
             </Row>
+            {/* calender */}
             <Row className='mb-4'>
                 <Col>
-                    <Table striped bordered hover>
+                    <Table striped bordered>
                         <thead>
                             <tr>
                                 {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day) => (
@@ -184,7 +196,7 @@ function Page() {
                             {calendar.map((week, i) => (
                                 <tr key={i}>
                                     {week.map((day, idx) => (
-                                        <TdComponent day={day} key={idx} events={events} handleTimeChange={handleTimeChange} isSunday={idx === 0} clearEvent={clearEvent} />
+                                        <TdComponent day={day} key={idx} monthKey={monthKey} events={events} handleTimeChange={handleTimeChange} isSunday={idx === 0} clearEvent={clearEvent} />
                                     ))}
                                 </tr>
                             ))}
@@ -210,24 +222,27 @@ const MyCard = ({ title, value }) => {
     )
 }
 
-const TdComponent = ({ day, events, handleTimeChange, isSunday, clearEvent }) => {
+const TdComponent = ({ monthKey, day, events, handleTimeChange, isSunday, clearEvent }) => {
     const [isEditable, setIsEditable] = useState(false);
     const inputId1 = Utils.generateId();
     const inputId2 = Utils.generateId();
 
     const today = moment(); // Get today's date
+    const { date, isInactive } = day;
 
-    const isFutureDay = day.isAfter(today, 'day'); // Check if the day is in the future
-    const { inTime, outTime, shortHours, extraHours } = events[day.format('YYYY-MM-DD')] || {}
+    const isFutureDay = date.isAfter(today, 'day'); // Check if the day is in the future
+    const { inTime, outTime, shortHours, extraHours, totalTime } = events?.[monthKey]?.[date.format('YYYY-MM-DD')] || {}
 
     const tdColor = shortHours ? 'bg-danger text-light' : extraHours ? 'bg-info  text-light' : (inTime && outTime) ? 'bg-success  text-light' : (inTime && !outTime) ? 'bg-warning text-light' : ''
+
+    const isDisabled = isSunday || isFutureDay || isInactive
 
     return (
         <td className={tdColor}>
             <div>
                 <div className='d-flex align-items-center justify-content-between gap-1'>
-                    <p className='mb-0 fw-bold'>{day.format('D')}</p>
-                    {!isSunday && !isFutureDay ? (
+                    <p className='mb-0 fw-bold'>{date.format('D')}</p>
+                    {!isDisabled ? (
                         <IconButton
                             sx='border-0'
                             sm
@@ -237,7 +252,7 @@ const TdComponent = ({ day, events, handleTimeChange, isSunday, clearEvent }) =>
                     ) : null}
                 </div>
 
-                {isSunday || isFutureDay ? (
+                {isDisabled ? (
                     <></>
                 ) : !isEditable ? (
                     <>
@@ -249,6 +264,9 @@ const TdComponent = ({ day, events, handleTimeChange, isSunday, clearEvent }) =>
                         {extraHours ?
                             <p className='mb-0'>Extra : {extraHours}</p> : <></>
                         }
+                        {Object.keys(totalTime || {}).length ?
+                            <p className='mb-0'>Total Time : {totalTime.hours + ' Hours ' + totalTime.minutes + ' Minutes'}</p> : <></>
+                        }
                     </>
                 ) : (
                     <>
@@ -259,7 +277,7 @@ const TdComponent = ({ day, events, handleTimeChange, isSunday, clearEvent }) =>
                                 type="time"
                                 className='border-0 rounded-1 px-2'
                                 value={inTime || ''}
-                                onChange={(e) => handleTimeChange(day.format('YYYY-MM-DD'), 'inTime', e.target.value)}
+                                onChange={(e) => handleTimeChange(date.format('YYYY-MM-DD'), 'inTime', e.target.value)}
                             />
                         </div>
                         <div>
@@ -269,14 +287,14 @@ const TdComponent = ({ day, events, handleTimeChange, isSunday, clearEvent }) =>
                                 type="time"
                                 value={outTime || ''}
                                 className='border-0 rounded-1 px-2'
-                                onChange={(e) => handleTimeChange(day.format('YYYY-MM-DD'), 'outTime', e.target.value)}
+                                onChange={(e) => handleTimeChange(date.format('YYYY-MM-DD'), 'outTime', e.target.value)}
                             />
                         </div>
                         <div>
                             <button
                                 type="button"
                                 className='mt-3 ms-auto d-block px-2 py-1 border-0 rounded-1'
-                                onClick={() => clearEvent(day.format('YYYY-MM-DD'))}
+                                onClick={() => clearEvent(date.format('YYYY-MM-DD'))}
                             >Clear Event</button>
                         </div>
                     </>
