@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Card, Col, Container, Row, Table } from 'react-bootstrap';
+import { Card, Col, Container, Row, Spinner, Table } from 'react-bootstrap';
 import { AppContext } from '../context';
 import moment from 'moment';
 import { IconButton } from '../components';
@@ -7,12 +7,15 @@ import { FaPen } from 'react-icons/fa';
 import { MdClose, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { Utils } from '../utils';
 import { CLEAR_EVENT, HANDLE_EVENT } from '../reducer';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../fire';
 
 function Page() {
     const { state, dispatch } = useContext(AppContext);
     const [currentMonth, setCurrentMonth] = useState(moment().date() >= 26 ? moment() : moment().subtract(1, 'month')); // Custom month logic
     const monthKey = currentMonth.clone().add(1, 'month').format('MMMM-YYYY')
     const [calendar, setCalendar] = React.useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const { events } = state
 
     useEffect(() => {
@@ -97,7 +100,6 @@ function Page() {
         });
     };
 
-
     const getTimeDifference = (time1, time2) => {
         const [hours1, minutes1] = time1.split(':').map(Number);
         const [hours2, minutes2] = time2.split(':').map(Number);
@@ -138,11 +140,23 @@ function Page() {
             }
         });
 
-        totalShortHours = totalShortHours > 0 ? (totalShortHours <= 3 ? 3 - totalShortHours : totalShortHours - 3) : 0
-
         adjustmentHours = totalShortHours > totalExtraHours ? (totalShortHours - totalExtraHours <= 3 ? (3 - (totalShortHours - totalExtraHours) || 3) : 0) : 3
+        totalShortHours = totalShortHours > 3 ? totalShortHours - 3 : 0
 
         return { totalHours, totalShortHours, totalExtraHours, adjustmentHours };
+    };
+
+    const saveEventToDB = async () => {
+        setIsLoading(true)
+        try {
+            await setDoc(doc(db, 'events', monthKey), events[monthKey]);
+            alert("Events successfully saved to Firestore!");
+        } catch (error) {
+            console.error("Error saving event to Firestore:", error);
+            alert("Error saving events to Firestore.");
+        } finally {
+            setIsLoading(false)
+        }
     };
 
     const { totalHours, totalShortHours, totalExtraHours, adjustmentHours } = calculateTotalHours();
@@ -184,10 +198,10 @@ function Page() {
                     <Card>
                         <Card.Body>
                             <div className='d-flex align-items-center justify-content-center gap-2'>
-                                <IconButton onClick={goToPreviousMonth} title='Previous Month' icon={<MdKeyboardArrowLeft />} sx='border-0' />
+                                {/* <IconButton onClick={goToPreviousMonth} title='Previous Month' icon={<MdKeyboardArrowLeft />} sx='border-0' /> */}
                                 <h5 className='text-center mb-0 fw-bold fs-4'>
                                     {currentMonth.clone().add(1, 'month').format('MMMM YYYY')}</h5>
-                                <IconButton onClick={goToNextMonth} title='Next Month' icon={<MdKeyboardArrowRight />} sx='border-0' />
+                                {/* <IconButton onClick={goToNextMonth} title='Next Month' icon={<MdKeyboardArrowRight />} sx='border-0' /> */}
                             </div>
                         </Card.Body>
                     </Card>
@@ -216,6 +230,20 @@ function Page() {
                             ))}
                         </tbody>
                     </Table>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <Card>
+                        <Card.Body>
+                            <button className='ms-auto d-block btn border border-secondary d-flex align-items-center justify-content-center gap-2 fw-bold' onClick={saveEventToDB}>{isLoading ?
+                                <Spinner size="sm" animation="border" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </Spinner> :
+                                <></>
+                            }Save Event</button>
+                        </Card.Body>
+                    </Card>
                 </Col>
             </Row>
         </Container>
