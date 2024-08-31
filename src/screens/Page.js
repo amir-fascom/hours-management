@@ -6,7 +6,7 @@ import { IconButton } from '../components';
 import { FaPen } from 'react-icons/fa';
 import { MdClose, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { Utils } from '../utils';
-import { CLEAR_EVENT, HANDLE_EVENT } from '../reducer';
+import { CLEAR_EVENT, HANDLE_EVENT, MARK_ABSENT } from '../reducer';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../fire';
 
@@ -92,7 +92,21 @@ function Page() {
         });
     };
 
-    // New function to clear the event
+    const markAbsent = (date) => {
+        const { absent = 0 } = events?.[monthKey]?.[date] || {}
+        console.log("🚀 ~ markAbsent ~ absent:", absent)
+        dispatch({
+            type: MARK_ABSENT,
+            payload: {
+                month: monthKey,
+                date,
+                event: {
+                    absent: absent ? 0 : 1
+                }
+            }
+        });
+    }
+
     const clearEvent = (date) => {
         dispatch({
             type: CLEAR_EVENT,
@@ -224,7 +238,7 @@ function Page() {
                             {calendar.map((week, i) => (
                                 <tr key={i}>
                                     {week.map((day, idx) => (
-                                        <TdComponent day={day} key={idx} monthKey={monthKey} events={events} handleTimeChange={handleTimeChange} isSunday={idx === 0} clearEvent={clearEvent} />
+                                        <TdComponent day={day} key={idx} monthKey={monthKey} events={events} handleTimeChange={handleTimeChange} isSunday={idx === 0} clearEvent={clearEvent} markAbsent={markAbsent} />
                                     ))}
                                 </tr>
                             ))}
@@ -273,18 +287,19 @@ const MyCard = ({ title, value }) => {
     )
 }
 
-const TdComponent = ({ monthKey, day, events, handleTimeChange, isSunday, clearEvent }) => {
+const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, isSunday, clearEvent }) => {
     const [isEditable, setIsEditable] = useState(false);
     const inputId1 = Utils.generateId();
     const inputId2 = Utils.generateId();
+    const checkboxId = Utils.generateId();
 
     const today = moment(); // Get today's date
     const { date, isInactive } = day;
 
     const isFutureDay = date.isAfter(today, 'day'); // Check if the day is in the future
-    const { inTime, outTime, shortHours, extraHours, totalTime } = events?.[monthKey]?.[date.format('YYYY-MM-DD')] || {}
+    const { inTime, outTime, shortHours, extraHours, totalTime, absent } = events?.[monthKey]?.[date.format('YYYY-MM-DD')] || {}
 
-    const tdColor = shortHours ? 'bg-danger text-light' : extraHours ? 'bg-info  text-light' : (inTime && outTime) ? 'bg-success  text-light' : (inTime && !outTime) ? 'bg-warning text-light' : ''
+    const tdColor = shortHours ? 'bg-danger text-light' : extraHours ? 'bg-info  text-light' : (inTime && outTime) ? 'bg-success  text-light' : (inTime && !outTime) ? 'bg-warning text-light' : absent ? 'bg-secondary text-light' : ''
 
     const isDisabled = isSunday || isFutureDay || isInactive
 
@@ -315,6 +330,9 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, isSunday, clearE
                         {extraHours ?
                             <p className='mb-0'>Extra : {extraHours}</p> : <></>
                         }
+                        {absent ?
+                            <p className='mb-0'>Absent : {absent}</p> : <></>
+                        }
                         {Object.keys(totalTime || {}).length ?
                             <p className='mb-0'>Total Time : {totalTime.hours + ' Hours ' + totalTime.minutes + ' Minutes'}</p> : <></>
                         }
@@ -328,23 +346,34 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, isSunday, clearE
                                 type="time"
                                 className='border-0 rounded-1 px-2'
                                 value={inTime || ''}
+                                disabled={absent}
                                 onChange={(e) => handleTimeChange(date.format('YYYY-MM-DD'), 'inTime', e.target.value)}
                             />
                         </div>
-                        <div>
+                        <div className='mb-1'>
                             <label className='w-25' htmlFor={inputId2}>Out</label>:&nbsp;
                             <input
                                 id={inputId2}
                                 type="time"
                                 value={outTime || ''}
+                                disabled={absent}
                                 className='border-0 rounded-1 px-2'
                                 onChange={(e) => handleTimeChange(date.format('YYYY-MM-DD'), 'outTime', e.target.value)}
                             />
                         </div>
-                        <div>
+                        <div className='mb-1'>
+                            <label className='w-25' htmlFor={checkboxId}>Absent</label>:&nbsp;
+                            <input
+                                id={checkboxId}
+                                type="checkbox"
+                                checked={absent || 0}
+                                onChange={(e) => markAbsent(date.format('YYYY-MM-DD'))}
+                            />
+                        </div>
+                        <div className='mt-2 d-flex gap-1 justify-content-end align-items-end'>
                             <button
                                 type="button"
-                                className='mt-3 ms-auto d-block px-2 py-1 border-0 rounded-1'
+                                className='d-block px-2 py-1 border-0 rounded-1'
                                 onClick={() => clearEvent(date.format('YYYY-MM-DD'))}
                             >Clear Event</button>
                         </div>
