@@ -16,7 +16,7 @@ function Page() {
     const monthKey = currentMonth.clone().add(1, 'month').format('MMMM-YYYY')
     const [calendar, setCalendar] = React.useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const { events } = state
+    const { events, user } = state
 
     useEffect(() => {
         generateCalendar(currentMonth);
@@ -163,7 +163,7 @@ function Page() {
     const saveEventToDB = async () => {
         setIsLoading(true)
         try {
-            await setDoc(doc(db, 'events', monthKey), events[monthKey]);
+            await setDoc(doc(db, user.uid, monthKey), events[monthKey]);
             alert("Events successfully saved to Firestore!");
         } catch (error) {
             console.error("Error saving event to Firestore:", error);
