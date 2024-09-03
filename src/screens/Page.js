@@ -154,8 +154,8 @@ function Page() {
             }
         });
 
-        adjustmentHours = totalShortHours > totalExtraHours ? (totalShortHours - totalExtraHours <= 3 ? (3 - (totalShortHours - totalExtraHours) || 3) : 0) : 3
-        totalShortHours = totalShortHours > 3 ? totalShortHours - 3 : 0
+        // adjustmentHours = totalShortHours > totalExtraHours ? (totalShortHours - totalExtraHours <= 3 ? (3 - (totalShortHours - totalExtraHours) || 3) : 0) : 3
+        // totalShortHours = totalShortHours > 3 ? totalShortHours - 3 : 0
 
         return { totalHours, totalShortHours, totalExtraHours, adjustmentHours };
     };
@@ -201,6 +201,7 @@ function Page() {
                                 <MyItem title='Day short' color='bg-danger' />
                                 <MyItem title='Day complete with extra hour' color='bg-info' />
                                 <MyItem title='Day incomplete' color='bg-warning' />
+                                <MyItem title='Day Off' color='bg-secondary' />
                             </div>
                         </Card.Body>
                     </Card>
