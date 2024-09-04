@@ -178,21 +178,21 @@ function Page() {
     return (
         <Container fluid className='py-4'>
             {/* stats */}
-            <Row className='mb-4'>
-                <Col xs={12} sm={6} md={3}>
+            <Row className='mb-2'>
+                <Col xs={12} sm={6} md={3} className='mb-2'>
                     <MyCard title='Total Hours' value={`${totalHours.hours} hours ${totalHours.minutes} minutes`} />
                 </Col>
-                <Col xs={12} sm={6} md={3}>
+                <Col xs={12} sm={6} md={3} className='mb-2'>
                     <MyCard title='Total Short Hours' value={`${totalShortHours} hours`} />
                 </Col>
-                <Col xs={12} sm={6} md={3}>
+                <Col xs={12} sm={6} md={3} className='mb-2'>
                     <MyCard title='Total Extra Hours' value={`${totalExtraHours} hours`} />
                 </Col>
-                <Col xs={12} sm={6} md={3}>
+                <Col xs={12} sm={6} md={3} className='mb-2'>
                     <MyCard title='Adjustment Hours' value={`${adjustmentHours} hours`} />
                 </Col>
             </Row>
-            <Row className='mb-4'>
+            <Row className='mb-4 d-none d-md-flex'>
                 <Col>
                     <Card>
                         <Card.Body>
@@ -225,7 +225,7 @@ function Page() {
             {/* calender */}
             <Row className='mb-4'>
                 <Col>
-                    <Table striped bordered>
+                    <Table striped bordered responsive style={{ minWidth: '1200px' }}>
                         <thead>
                             <tr>
                                 {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day) => (
@@ -275,7 +275,7 @@ const MyItem = ({ title, color }) => {
 const MyCard = ({ title, value }) => {
     return (
         <Card>
-            <Card.Body className='text-center'>
+            <Card.Body className='text-center' >
                 <h5 className='border-bottom border-secondary pb-2'>{title}</h5>
                 <h5>{value}</h5>
             </Card.Body>

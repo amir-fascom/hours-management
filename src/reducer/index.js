@@ -44,7 +44,7 @@ export const appReducer = (state, action) => {
             };
         case CLEAR_EVENT:
             const updatedEvents = { ...state.events };
-            delete updatedEvents[action.payload.date];
+            delete updatedEvents[action.payload.month][action.payload.date];
             return {
                 ...state,
                 events: updatedEvents,
