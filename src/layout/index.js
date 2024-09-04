@@ -74,10 +74,14 @@ function Layout({ children }) {
         );
     }
 
+    if (!isLogged) {
+        <AuthContainer auth={auth} dispatch={dispatch} />
+    }
+
     return (
         <>
             <Header logout={logout} user={user} />
-            {isLogged ? children : <AuthContainer auth={auth} dispatch={dispatch} />}
+            {children}
         </>
     );
 }
