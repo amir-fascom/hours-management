@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "HMS",
+  "name": "Hours Management System",
+  "description": "A system designed for employees and employers to track work hours, in/out times, short and extra hours, with detailed monthly statistics.",
   "icons": [
     {
       "src": "favicon.ico",

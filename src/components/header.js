@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Col, Container, Row } from 'react-bootstrap';
+import { Card, Container } from 'react-bootstrap';
+import PrimaryButton from './primaryButton';
 
 function Header({ user, logout = () => { } }) {
 
@@ -9,7 +10,7 @@ function Header({ user, logout = () => { } }) {
                 <Card>
                     <Card.Body className='d-flex justify-content-end align-items-center gap-2'>
                         <p className='mb-0 fw-semibold fs-6'>{user.email}</p>
-                        <button className='btn border-secondary fw-semibold' onClick={logout}>LogOut</button>
+                        <PrimaryButton onClick={logout} title='LogOut' />
                     </Card.Body>
                 </Card>
             </Container>

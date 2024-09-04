@@ -1,70 +1,104 @@
-# Getting Started with Create React App
+# Hours Management System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The **Hours Management System** is a web application designed to help users track their work hours efficiently. Users can log in/out times, calculate short and extra hours, and get a detailed breakdown of work statistics over a custom month period.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Custom Month Management**: Supports a custom monthly calendar where the month starts on the 26th of the previous month and ends on the 25th of the current month.
+- **In/Out Time Tracking**: Record daily in/out times to keep track of work hours.
+- **Short and Extra Hours Calculation**: Automatically calculate short hours (less than 9 hours) and extra hours (more than 9 hours) for each workday.
+- **Event and Calendar Management**: Add, edit, or delete work hours directly from the calendar interface.
+- **Firestore Integration**: Save and fetch work events from Firebase Firestore for persistent data storage.
+- **Responsive Design**: Built with Bootstrap for mobile-friendly and responsive UI.
+- **Statistics Generation**: Generate monthly statistics such as total hours, short hours, extra hours, and adjustment hours.
 
-### `npm start`
+## Demo
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+A live demo of the application is hosted on Firebase. Check it out [here](https://your-firebase-app-url).
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Screenshots
 
-### `npm test`
+![Dashboard Screenshot](screenshots/screen1.png)
+![Calendar Screenshot](screenshots/screen2.png)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Tech Stack
 
-### `npm run build`
+- **Frontend**: React.js, Bootstrap
+- **Backend**: Firebase Firestore
+- **State Management**: React Context API with Reducer
+- **Date Manipulation**: Moment.js
+- **Build & Hosting**: Firebase
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+To get started with the Hours Management System on your local machine, follow the steps below.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Prerequisites
 
-### `npm run eject`
+- [Node.js](https://nodejs.org/en/download/) (v14 or above)
+- Firebase account with Firestore enabled
+- [Firebase CLI](https://firebase.google.com/docs/cli) (to deploy and host the application)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Installation
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. **Clone the repository**
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+   ```bash
+   git clone https://github.com/your-username/hours-management-system.git
+   cd hours-management-system
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+2. **Install dependencies**
 
-## Learn More
+    ```bash
+   npm install
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+3. **Setup Firebase**
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- Setup FirebaseGo to your Firebase Console, create a project, and set up Firestore.
+- Create a .env file in the root directory and add your Firebase config variables
 
-### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+    ```bash
+    REACT_APP_apiKey=your-api-key
+    REACT_APP_authDomain=your-auth-domain
+    REACT_APP_projectId=your-project-id
+    REACT_APP_storageBucket=your-storage-bucket
+    REACT_APP_messagingSenderId=your-messaging-sender-id
+    REACT_APP_appId=your-app-id
 
-### Analyzing the Bundle Size
+4. **Start the development server**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+    ```bash
+   npm start
 
-### Making a Progressive Web App
+The app will start running at http://localhost:3000.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Deploy to Firebase
 
-### Advanced Configuration
+1. **Build the project**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+   ```bash
+   npm run build
 
-### Deployment
+2. **Deploy**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+    ```bash
+    firebase deploy
 
-### `npm run build` fails to minify
+This will upload your built project to Firebase Hosting and make it available via your Firebase app URL.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Usage
+
+- Track Hours: Add daily work events by selecting dates on the calendar. Enter in/out times, and the system will calculate short and extra hours automatically.
+- Save Events: Once all events are added for the month, click the "Save Events" button to store the data in Firestore.
+- View Statistics: The system will generate statistics for the month and display them on the dashboard.
+
+### Roadmap
+
+- Add user authentication (using Firebase Auth).
+- Implement hourly reports and weekly stats.
+- Enable export of data as CSV or PDF.
+
+### Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change. Make sure to update tests as appropriate.

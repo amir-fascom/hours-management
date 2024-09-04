@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Card, Col, Container, Row, Spinner, Table } from 'react-bootstrap';
+import { Card, Col, Container, Row, Table } from 'react-bootstrap';
 import { AppContext } from '../context';
 import moment from 'moment';
-import { IconButton } from '../components';
+import { IconButton, PrimaryButton } from '../components';
 import { FaPen } from 'react-icons/fa';
 import { MdClose, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { Utils } from '../utils';
@@ -251,12 +251,7 @@ function Page() {
                 <Col>
                     <Card>
                         <Card.Body>
-                            <button className='ms-auto d-block btn border border-secondary d-flex align-items-center justify-content-center gap-2 fw-bold' onClick={saveEventToDB}>{isLoading ?
-                                <Spinner size="sm" animation="border" role="status">
-                                    <span className="visually-hidden">Loading...</span>
-                                </Spinner> :
-                                <></>
-                            }Save Event</button>
+                            <PrimaryButton title='Save Event' isLoading={isLoading} sx='ms-auto d-block' onClick={saveEventToDB} />
                         </Card.Body>
                     </Card>
                 </Col>

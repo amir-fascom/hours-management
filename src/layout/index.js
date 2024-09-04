@@ -4,7 +4,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 import moment from 'moment';
 import { Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { db } from '../fire';
-import { Header } from '../components';
+import { Header, PrimaryButton } from '../components';
 import { AppContext } from '../context';
 import { INITIALIZE_EVENTS, LOGIN, LOGIN_OUT } from '../reducer';
 
@@ -88,9 +88,11 @@ const AuthContainer = ({ auth, dispatch }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLogin, setIsLogin] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setIsLoading(true)
         if (isLogin) {
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
@@ -98,9 +100,9 @@ const AuthContainer = ({ auth, dispatch }) => {
                     dispatch({ type: LOGIN, payload: user })
                 })
                 .catch((error) => {
-                    const errorCode = error.code;
                     const errorMessage = error.message;
                     window.alert(errorMessage)
+                    setIsLoading(false)
                 });
         } else {
             createUserWithEmailAndPassword(auth, email, password)
@@ -109,22 +111,21 @@ const AuthContainer = ({ auth, dispatch }) => {
                     dispatch({ type: LOGIN, payload: user })
                 })
                 .catch((error) => {
-                    const errorCode = error.code;
                     const errorMessage = error.message;
                     window.alert(errorMessage)
+                    setIsLoading(false)
                 });
-
         }
     }
 
     return (
-        <Container fluid>
+        <Container fluid className='mt-5'>
             <Row>
                 <Col>
                     <Card>
                         <Card.Body className='py-5'>
                             <Form onSubmit={handleSubmit} className='mx-auto' style={{ maxWidth: '550px' }}>
-                                <p className='fs-5 fw-semibold text-center mb-4'>Admin</p>
+                                <p className='fs-5 fw-semibold text-center mb-4'>Hours Management System</p>
                                 <div className='d-flex align-items-center justify-content-center mb-3 gap-2'>
                                     <Form.Check
                                         inline
@@ -146,15 +147,13 @@ const AuthContainer = ({ auth, dispatch }) => {
                                     />
                                 </div>
                                 <Form.Group className="mb-3" controlId="formBasicEmail">
-                                    <Form.Control type="email" required placeholder="Enter email" value={email} onChange={e => setEmail(e.target.value)} />
+                                    <Form.Control type="email" required placeholder="Enter email" className='border-secondary' value={email} onChange={e => setEmail(e.target.value)} />
                                 </Form.Group>
                                 <Form.Group className="mb-3" controlId="formBasicPassword">
-                                    <Form.Control type="password" required placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+                                    <Form.Control type="password" required placeholder="Password" className='border-secondary' value={password} onChange={e => setPassword(e.target.value)} />
                                 </Form.Group>
                                 <div className='d-flex align-items-end justify-content-end'>
-                                    <button type='submit' className='btn border-secondary fw-semibold'>
-                                        Submit
-                                    </button>
+                                    <PrimaryButton isLoading={isLoading} type='submit' title={isLogin ? 'Login' : 'Register'} />
                                 </div>
                             </Form>
                         </Card.Body>
