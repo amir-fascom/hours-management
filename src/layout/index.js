@@ -75,7 +75,7 @@ function Layout({ children }) {
     }
 
     if (!isLogged) {
-        <AuthContainer auth={auth} dispatch={dispatch} />
+        return <AuthContainer auth={auth} dispatch={dispatch} />
     }
 
     return (
@@ -123,47 +123,39 @@ const AuthContainer = ({ auth, dispatch }) => {
     }
 
     return (
-        <Container fluid className='mt-5'>
-            <Row>
-                <Col>
-                    <Card>
-                        <Card.Body className='py-5'>
-                            <Form onSubmit={handleSubmit} className='mx-auto' style={{ maxWidth: '550px' }}>
-                                <p className='fs-5 fw-semibold text-center mb-4'>Hours Management System</p>
-                                <div className='d-flex align-items-center justify-content-center mb-3 gap-2'>
-                                    <Form.Check
-                                        inline
-                                        label="Login"
-                                        name="group1"
-                                        type='radio'
-                                        id='login'
-                                        checked={isLogin}
-                                        onChange={() => setIsLogin(true)}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        label="Register"
-                                        name="group1"
-                                        type='radio'
-                                        id='register'
-                                        checked={!isLogin}
-                                        onChange={() => setIsLogin(false)}
-                                    />
-                                </div>
-                                <Form.Group className="mb-3" controlId="formBasicEmail">
-                                    <Form.Control type="email" required placeholder="Enter email" className='border-secondary' value={email} onChange={e => setEmail(e.target.value)} />
-                                </Form.Group>
-                                <Form.Group className="mb-3" controlId="formBasicPassword">
-                                    <Form.Control type="password" required placeholder="Password" className='border-secondary' value={password} onChange={e => setPassword(e.target.value)} />
-                                </Form.Group>
-                                <div className='d-flex align-items-end justify-content-end'>
-                                    <PrimaryButton isLoading={isLoading} type='submit' title={isLogin ? 'Login' : 'Register'} />
-                                </div>
-                            </Form>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
+        <Container fluid style={{ minHeight: '100vh' }} className='bg-light'>
+            <Form onSubmit={handleSubmit} className='mx-auto px-2 py-4' style={{ maxWidth: '550px' }}>
+                <p className='fs-5 fw-semibold text-center mb-4'>Hours Management System</p>
+                <div className='d-flex align-items-center justify-content-center mb-3 gap-2'>
+                    <Form.Check
+                        inline
+                        label="Login"
+                        name="group1"
+                        type='radio'
+                        id='login'
+                        checked={isLogin}
+                        onChange={() => setIsLogin(true)}
+                    />
+                    <Form.Check
+                        inline
+                        label="Register"
+                        name="group1"
+                        type='radio'
+                        id='register'
+                        checked={!isLogin}
+                        onChange={() => setIsLogin(false)}
+                    />
+                </div>
+                <Form.Group className="mb-3" controlId="formBasicEmail">
+                    <Form.Control type="email" required placeholder="Enter email" className='border-secondary' value={email} onChange={e => setEmail(e.target.value)} />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formBasicPassword">
+                    <Form.Control type="password" required placeholder="Password" className='border-secondary' value={password} onChange={e => setPassword(e.target.value)} />
+                </Form.Group>
+                <div className='d-flex align-items-end justify-content-end'>
+                    <PrimaryButton isLoading={isLoading} type='submit' title={isLogin ? 'Login' : 'Register'} />
+                </div>
+            </Form>
         </Container>
     )
 }
