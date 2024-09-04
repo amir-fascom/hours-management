@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import moment from 'moment';
-import { Card, Col, Container, Form, Row } from 'react-bootstrap';
+import { Container, Form } from 'react-bootstrap';
 import { db } from '../fire';
 import { Header, PrimaryButton } from '../components';
 import { AppContext } from '../context';

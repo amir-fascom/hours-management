@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Card, Col, Container, Row, Table } from 'react-bootstrap';
 import { AppContext } from '../context';
 import moment from 'moment';
@@ -6,25 +6,54 @@ import { IconButton, PrimaryButton } from '../components';
 import { FaPen } from 'react-icons/fa';
 import { MdClose, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { Utils } from '../utils';
-import { CLEAR_EVENT, HANDLE_EVENT, MARK_ABSENT } from '../reducer';
-import { doc, setDoc } from 'firebase/firestore';
+import { CLEAR_EVENT, HANDLE_EVENT, INITIALIZE_EVENTS, MARK_ABSENT } from '../reducer';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../fire';
 
 function Page() {
     const { state, dispatch } = useContext(AppContext);
-    const [currentMonth, setCurrentMonth] = useState(moment().date() >= 26 ? moment() : moment().subtract(1, 'month')); // Custom month logic
-    const monthKey = currentMonth.clone().add(1, 'month').format('MMMM-YYYY')
+    const _cm = moment().date() >= 26 ? moment().subtract(1, 'month').format("MMMM-YYYY") : moment().format("MMMM-YYYY");
+    const [currentMonth, setCurrentMonth] = useState(moment().date() >= 26 ? moment().subtract(1, 'month') : moment());
+    const monthKey = currentMonth.clone().format('MMMM-YYYY')
     const [calendar, setCalendar] = React.useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const { events, user } = state
+    const ref = useRef(null)
 
     useEffect(() => {
         generateCalendar(currentMonth);
     }, [currentMonth]);
 
+    useEffect(() => {
+        if (ref.current === 'fetchPrevMonthData') {
+            fetchData(monthKey);
+        }
+        ref.current = null
+    }, [monthKey]);
+
+    const fetchData = async (month) => {
+        try {
+            // Get a reference to the collection
+            const docRef = doc(db, user.uid, month);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                dispatch({
+                    type: INITIALIZE_EVENTS,
+                    payload: { [month]: data }
+                });
+            } else {
+                console.log('No such document!');
+            }
+        } catch (e) {
+            console.error("Error getting document: ", e);
+            window.alert("Unable to get Events.\nUnexpected Error occurred.")
+        }
+    };
+
     const generateCalendar = (month) => {
-        const startOfMonth = month.clone().date(26);
-        const endOfMonth = month.clone().add(1, 'month').date(25);
+        const startOfMonth = month.clone().subtract(1, 'month').date(26);
+        const endOfMonth = month.clone().date(25);
 
         let startDate = startOfMonth.clone().startOf('week');
         let endDate = endOfMonth.clone().endOf('week');
@@ -46,8 +75,8 @@ function Page() {
         setCalendar(calendarDays);
     };
 
-
     const goToPreviousMonth = () => {
+        ref.current = 'fetchPrevMonthData'
         setCurrentMonth(prevMonth => prevMonth.clone().subtract(1, 'month'));
     };
 
@@ -94,7 +123,6 @@ function Page() {
 
     const markAbsent = (date) => {
         const { absent = 0 } = events?.[monthKey]?.[date] || {}
-        console.log("🚀 ~ markAbsent ~ absent:", absent)
         dispatch({
             type: MARK_ABSENT,
             payload: {
@@ -213,10 +241,10 @@ function Page() {
                     <Card>
                         <Card.Body>
                             <div className='d-flex align-items-center justify-content-center gap-2'>
-                                {/* <IconButton onClick={goToPreviousMonth} title='Previous Month' icon={<MdKeyboardArrowLeft />} sx='border-0' /> */}
+                                <IconButton onClick={goToPreviousMonth} title='Previous Month' icon={<MdKeyboardArrowLeft />} sx='border-0' />
                                 <h5 className='text-center mb-0 fw-bold fs-4'>
-                                    {currentMonth.clone().add(1, 'month').format('MMMM YYYY')}</h5>
-                                {/* <IconButton onClick={goToNextMonth} title='Next Month' icon={<MdKeyboardArrowRight />} sx='border-0' /> */}
+                                    {currentMonth.clone().format('MMMM YYYY')}</h5>
+                                {_cm === monthKey ? <></> : <IconButton onClick={goToNextMonth} title='Next Month' icon={<MdKeyboardArrowRight />} sx='border-0' />}
                             </div>
                         </Card.Body>
                     </Card>
@@ -239,7 +267,7 @@ function Page() {
                             {calendar.map((week, i) => (
                                 <tr key={i}>
                                     {week.map((day, idx) => (
-                                        <TdComponent day={day} key={idx} monthKey={monthKey} events={events} handleTimeChange={handleTimeChange} isSunday={idx === 0} clearEvent={clearEvent} markAbsent={markAbsent} />
+                                        <TdComponent day={day} key={idx} disableEditing={_cm !== monthKey} monthKey={monthKey} events={events} handleTimeChange={handleTimeChange} isSunday={idx === 0} clearEvent={clearEvent} markAbsent={markAbsent} />
                                     ))}
                                 </tr>
                             ))}
@@ -283,7 +311,7 @@ const MyCard = ({ title, value }) => {
     )
 }
 
-const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, isSunday, clearEvent }) => {
+const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, isSunday, clearEvent, disableEditing }) => {
     const [isEditable, setIsEditable] = useState(false);
     const inputId1 = Utils.generateId();
     const inputId2 = Utils.generateId();
@@ -304,14 +332,14 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, isSu
             <div>
                 <div className='d-flex align-items-center justify-content-between gap-1'>
                     <p className='mb-0 fw-bold'>{date.format('D')}</p>
-                    {!isDisabled ? (
+                    {isDisabled || disableEditing ? <></> : (
                         <IconButton
                             sx='border-0'
                             sm
                             onClick={() => setIsEditable(!isEditable)}
                             icon={isEditable ? <MdClose style={{ fontSize: '14px' }} /> : <FaPen style={{ fontSize: '12px' }} />}
                         />
-                    ) : null}
+                    )}
                 </div>
 
                 {isDisabled ? (
