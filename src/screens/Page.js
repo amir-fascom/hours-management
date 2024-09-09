@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Card, Col, Container, Row, Table } from 'react-bootstrap';
+import { Badge, Card, Col, Container, Row, Table } from 'react-bootstrap';
 import { AppContext } from '../context';
 import moment from 'moment';
 import { IconButton, PrimaryButton } from '../components';
@@ -135,6 +135,34 @@ function Page() {
         });
     }
 
+    const markHoliday = (date) => {
+        const { publicHoliday = 0 } = events?.[monthKey]?.[date] || {}
+        dispatch({
+            type: MARK_ABSENT,
+            payload: {
+                month: monthKey,
+                date,
+                event: {
+                    publicHoliday: publicHoliday ? 0 : 1
+                }
+            }
+        });
+    }
+    const handleReason = (date, text) => {
+        const event = events?.[monthKey]?.[date] || {}
+        dispatch({
+            type: MARK_ABSENT,
+            payload: {
+                month: monthKey,
+                date,
+                event: {
+                    ...event,
+                    reason: text
+                }
+            }
+        });
+    }
+
     const clearEvent = (date) => {
         dispatch({
             type: CLEAR_EVENT,
@@ -225,11 +253,11 @@ function Page() {
                     <Card>
                         <Card.Body>
                             <div className='d-flex align-items-center justify-content-center gap-3'>
-                                <MyItem title='Day complete' color='bg-success' />
-                                <MyItem title='Day short' color='bg-danger' />
-                                <MyItem title='Day complete with extra hour' color='bg-info' />
-                                <MyItem title='Day incomplete' color='bg-warning' />
-                                <MyItem title='Day Off' color='bg-secondary' />
+                                <MyItem title='Day complete' color='success' />
+                                <MyItem title='Day complete with extra hour' color='info' />
+                                <MyItem title='Day incomplete' color='warning' />
+                                <MyItem title='Day short' color='danger' />
+                                <MyItem title='Day Off || Public Holiday' color='secondary' />
                             </div>
                         </Card.Body>
                     </Card>
@@ -267,7 +295,7 @@ function Page() {
                             {calendar.map((week, i) => (
                                 <tr key={i}>
                                     {week.map((day, idx) => (
-                                        <TdComponent day={day} key={idx} disableEditing={_cm !== monthKey} monthKey={monthKey} events={events} handleTimeChange={handleTimeChange} isSunday={idx === 0} clearEvent={clearEvent} markAbsent={markAbsent} />
+                                        <TdComponent day={day} key={idx} disableEditing={_cm !== monthKey} monthKey={monthKey} events={events} handleTimeChange={handleTimeChange} isSunday={idx === 0} clearEvent={clearEvent} markAbsent={markAbsent} markHoliday={markHoliday} handleReason={handleReason} />
                                     ))}
                                 </tr>
                             ))}
@@ -292,12 +320,15 @@ export default Page;
 
 
 const MyItem = ({ title, color }) => {
-    return (
-        <div className='d-flex align-items-center justify-content-center gap-1'>
-            <span className={`${color} d-inline-block rounded`} style={{ width: 25, height: 10 }}></span>
-            <span className='fw-bold' style={{ fontSize: "12px" }}>{title}</span>
-        </div>
-    )
+    return <Badge bg={color}>
+        {title}
+    </Badge>
+    // return (
+    //     <div className='d-flex align-items-center justify-content-center gap-1'>
+    //         <span className={`${color} d-inline-block rounded`} style={{ width: 25, height: 10 }}></span>
+    //         <span className='fw-bold' style={{ fontSize: "12px" }}>{title}</span>
+    //     </div>
+    // )
 }
 
 const MyCard = ({ title, value }) => {
@@ -311,19 +342,16 @@ const MyCard = ({ title, value }) => {
     )
 }
 
-const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, isSunday, clearEvent, disableEditing }) => {
+const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, markHoliday, handleReason, isSunday, clearEvent, disableEditing }) => {
     const [isEditable, setIsEditable] = useState(false);
-    const inputId1 = Utils.generateId();
-    const inputId2 = Utils.generateId();
-    const checkboxId = Utils.generateId();
 
-    const today = moment(); // Get today's date
+    const today = moment();
     const { date, isInactive } = day;
 
-    const isFutureDay = date.isAfter(today, 'day'); // Check if the day is in the future
-    const { inTime, outTime, shortHours, extraHours, totalTime, absent } = events?.[monthKey]?.[date.format('YYYY-MM-DD')] || {}
+    const isFutureDay = date.isAfter(today, 'day');
+    const { inTime, outTime, shortHours, extraHours, totalTime, absent, reason, publicHoliday } = events?.[monthKey]?.[date.format('YYYY-MM-DD')] || {}
 
-    const tdColor = shortHours ? 'bg-danger text-light' : extraHours ? 'bg-info  text-light' : (inTime && outTime) ? 'bg-success  text-light' : (inTime && !outTime) ? 'bg-warning text-light' : absent ? 'bg-secondary text-light' : ''
+    const tdColor = shortHours ? 'bg-danger text-light' : extraHours ? 'bg-info  text-light' : (inTime && outTime) ? 'bg-success  text-light' : (inTime && !outTime) ? 'bg-warning text-light' : (absent || publicHoliday) ? 'bg-secondary text-light' : ''
 
     const isDisabled = isSunday || isFutureDay || isInactive
 
@@ -332,68 +360,72 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, isSu
             <div>
                 <div className='d-flex align-items-center justify-content-between gap-1'>
                     <p className='mb-0 fw-bold'>{date.format('D')}</p>
-                    {isDisabled || disableEditing ? <></> : (
+                    <ConditionalTag condition={!isDisabled || !disableEditing}>
                         <IconButton
                             sx='border-0'
                             sm
                             onClick={() => setIsEditable(!isEditable)}
                             icon={isEditable ? <MdClose style={{ fontSize: '14px' }} /> : <FaPen style={{ fontSize: '12px' }} />}
                         />
-                    )}
+                    </ConditionalTag>
                 </div>
-
-                {isDisabled ? (
-                    <></>
-                ) : !isEditable ? (
-                    <>
-                        <p className='mb-1'>In : {inTime || '--:--'}</p>
-                        <p className='mb-0'>Out : {outTime || '--:--'}</p>
-                        {shortHours ?
-                            <p className='mb-0'>Short : {shortHours}</p> : <></>
-                        }
-                        {extraHours ?
-                            <p className='mb-0'>Extra : {extraHours}</p> : <></>
-                        }
-                        {absent ?
-                            <p className='mb-0'>Absent : {absent}</p> : <></>
-                        }
-                        {Object.keys(totalTime || {}).length ?
-                            <p className='mb-0'>Total Time : {totalTime.hours + ' Hours ' + totalTime.minutes + ' Minutes'}</p> : <></>
-                        }
-                    </>
-                ) : (
-                    <>
-                        <div className='mb-1'>
-                            <label className='w-25' htmlFor={inputId1}>In</label>:&nbsp;
-                            <input
-                                id={inputId1}
-                                type="time"
-                                className='border-0 rounded-1 px-2'
+                <ConditionalTag condition={!isDisabled}>
+                    <ConditionalTag condition={!isEditable}>
+                        <ConditionalTag condition={!absent && !publicHoliday}>
+                            <p className='mb-1'>In : {inTime || '--:--'}</p>
+                            <p className='mb-0'>Out : {outTime || '--:--'}</p>
+                        </ConditionalTag>
+                        <ConditionalTag condition={shortHours}>
+                            <p className='mb-0'>Short : {shortHours}</p>
+                        </ConditionalTag>
+                        <ConditionalTag condition={extraHours}>
+                            <p className='mb-0'>Extra : {extraHours}</p>
+                        </ConditionalTag>
+                        <ConditionalTag condition={absent}>
+                            <p className='mb-0'>Absent : {absent}</p>
+                        </ConditionalTag>
+                        <ConditionalTag condition={publicHoliday}>
+                            <p className='mb-0'>Public Holiday : {publicHoliday}</p>
+                        </ConditionalTag>
+                        <ConditionalTag condition={reason}>
+                            <p className='mb-0'>{reason}</p>
+                        </ConditionalTag>
+                        <ConditionalTag condition={Object.keys(totalTime || {}).length}>
+                            <p className='mb-0'>Total Time : {totalTime?.hours + ' Hours ' + totalTime?.minutes + ' Minutes'}</p>
+                        </ConditionalTag>
+                    </ConditionalTag>
+                    <ConditionalTag condition={isEditable}>
+                        <ConditionalTag condition={!absent && !publicHoliday}>
+                            <InputField
+                                label='In'
                                 value={inTime || ''}
-                                disabled={absent}
+                                // disabled={absent || publicHoliday}
                                 onChange={(e) => handleTimeChange(date.format('YYYY-MM-DD'), 'inTime', e.target.value)}
                             />
-                        </div>
-                        <div className='mb-1'>
-                            <label className='w-25' htmlFor={inputId2}>Out</label>:&nbsp;
-                            <input
-                                id={inputId2}
-                                type="time"
+                            <InputField
+                                label='Out'
                                 value={outTime || ''}
-                                disabled={absent}
-                                className='border-0 rounded-1 px-2'
+                                // disabled={absent || publicHoliday}
                                 onChange={(e) => handleTimeChange(date.format('YYYY-MM-DD'), 'outTime', e.target.value)}
                             />
-                        </div>
-                        <div className='mb-1'>
-                            <label className='w-25' htmlFor={checkboxId}>Absent</label>:&nbsp;
-                            <input
-                                id={checkboxId}
-                                type="checkbox"
-                                checked={absent || 0}
-                                onChange={(e) => markAbsent(date.format('YYYY-MM-DD'))}
+                        </ConditionalTag>
+                        <CheckBox
+                            label='Absent'
+                            checked={absent || 0}
+                            onChange={(e) => markAbsent(date.format('YYYY-MM-DD'))}
+                        />
+                        <CheckBox
+                            label='Public Holiday'
+                            checked={publicHoliday || 0}
+                            onChange={(e) => markHoliday(date.format('YYYY-MM-DD'))}
+                        />
+                        <ConditionalTag condition={absent || publicHoliday}>
+                            <TextArea
+                                label="Reason"
+                                value={reason || ''}
+                                onChange={(e) => handleReason(date.format('YYYY-MM-DD'), e.target.value)}
                             />
-                        </div>
+                        </ConditionalTag>
                         <div className='mt-2 d-flex gap-1 justify-content-end align-items-end'>
                             <button
                                 type="button"
@@ -401,9 +433,51 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, isSu
                                 onClick={() => clearEvent(date.format('YYYY-MM-DD'))}
                             >Clear Event</button>
                         </div>
-                    </>
-                )}
+                    </ConditionalTag>
+                </ConditionalTag>
             </div>
-        </td>
+        </td >
     );
 };
+
+
+const ConditionalTag = ({ condition, children }) => {
+    return condition ? children : <></>
+}
+
+const InputField = ({ label, ...props }) => {
+    const inputId = Utils.generateId()
+    return <div className='mb-1'>
+        <label className='w-25' htmlFor={inputId}>{label}</label>:&nbsp;
+        <input
+            type="time"
+            id={inputId}
+            className='border-0 rounded-1 px-2'
+            {...props}
+        />
+    </div>
+}
+
+const CheckBox = ({ label, ...props }) => {
+    const checkboxId = Utils.generateId()
+    return <div className='mb-1'>
+        <label className='w-25' htmlFor={checkboxId}>{label}</label>:&nbsp;
+        <input
+            id={checkboxId}
+            type="checkbox"
+            {...props}
+        />
+    </div>
+}
+
+const TextArea = ({ label, ...props }) => {
+    const textId3 = Utils.generateId()
+    return <div className='mb-1' >
+        <label className='w-25' style={{ verticalAlign: "top" }} htmlFor={textId3}>{label}</label><span style={{ verticalAlign: "top" }}>:</span>&nbsp;
+        <textarea
+            id={textId3}
+            className='border-0 rounded-1 px-2'
+            {...props}
+        />
+    </div>
+}
