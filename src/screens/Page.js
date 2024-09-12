@@ -90,18 +90,19 @@ function Page() {
 
         if (updatedEvent.inTime && updatedEvent.outTime) {
             const { hours, minutes } = getTimeDifference(updatedEvent.inTime, updatedEvent.outTime);
+            const _hour = minutes < 60 && minutes >= 50 ? hours + 1 : hours
 
             updatedEvent.totalTime = {
                 hours,
                 minutes
             };
             // Determine if the hours should be counted as short or extra
-            if (hours < 9) {
-                updatedEvent.shortHours = 9 - hours;
+            if (_hour < 9) {
+                updatedEvent.shortHours = 9 - _hour;
                 updatedEvent.extraHours = 0;
-            } else if (hours > 9) {
+            } else if (_hour > 9) {
                 updatedEvent.shortHours = 0;
-                updatedEvent.extraHours = hours - 9;
+                updatedEvent.extraHours = _hour - 9;
             } else {
                 updatedEvent.shortHours = 0;
                 updatedEvent.extraHours = 0;
@@ -209,9 +210,6 @@ function Page() {
                 totalExtraHours += event.extraHours || 0;
             }
         });
-
-        // adjustmentHours = totalShortHours > totalExtraHours ? (totalShortHours - totalExtraHours <= 3 ? (3 - (totalShortHours - totalExtraHours) || 3) : 0) : 3
-        // totalShortHours = totalShortHours > 3 ? totalShortHours - 3 : 0
 
         return { totalHours, totalShortHours, totalExtraHours, adjustmentHours };
     };
@@ -323,12 +321,6 @@ const MyItem = ({ title, color }) => {
     return <Badge bg={color}>
         {title}
     </Badge>
-    // return (
-    //     <div className='d-flex align-items-center justify-content-center gap-1'>
-    //         <span className={`${color} d-inline-block rounded`} style={{ width: 25, height: 10 }}></span>
-    //         <span className='fw-bold' style={{ fontSize: "12px" }}>{title}</span>
-    //     </div>
-    // )
 }
 
 const MyCard = ({ title, value }) => {
