@@ -87,7 +87,14 @@ function Page() {
     const handleTimeChange = (date, timeType, value) => {
         // Update the event in the state
         const updatedEvent = { ...events?.[monthKey]?.[date], [timeType]: value };
-
+        if (updatedEvent.inTime) {
+            const [hours, minutes] = updatedEvent.inTime.split(':').map(Number);
+            if (hours >= 11 && minutes > 0) {
+                updatedEvent.penalty = 1;
+            } else {
+                updatedEvent.penalty = 0;
+            }
+        }
         if (updatedEvent.inTime && updatedEvent.outTime) {
             const { hours, minutes } = getTimeDifference(updatedEvent.inTime, updatedEvent.outTime);
             const _hour = minutes < 60 && minutes >= 50 ? hours + 1 : hours
@@ -189,6 +196,7 @@ function Page() {
         let totalHours = { hours: 0, minutes: 0 };
         let totalShortHours = 0;
         let totalExtraHours = 0;
+        let penaltyHours = 0;
         let adjustmentHours = 3;
 
         Object.values(events?.[monthKey] || {}).forEach(event => {
@@ -208,10 +216,11 @@ function Page() {
                 // Sum up short and extra hours
                 totalShortHours += event.shortHours || 0;
                 totalExtraHours += event.extraHours || 0;
+                penaltyHours += event.penalty || 0;
             }
         });
 
-        return { totalHours, totalShortHours, totalExtraHours, adjustmentHours };
+        return { totalHours, totalShortHours, totalExtraHours, adjustmentHours, penaltyHours };
     };
 
     const saveEventToDB = async () => {
@@ -227,7 +236,7 @@ function Page() {
         }
     };
 
-    const { totalHours, totalShortHours, totalExtraHours, adjustmentHours } = calculateTotalHours();
+    const { totalHours, totalShortHours, totalExtraHours, adjustmentHours, penaltyHours } = calculateTotalHours();
 
     return (
         <Container fluid className='py-4'>
@@ -240,11 +249,14 @@ function Page() {
                     <MyCard title='Total Short Hours' value={`${totalShortHours} hours`} />
                 </Col>
                 <Col xs={12} sm={6} md={3} className='mb-2'>
-                    <MyCard title='Total Extra Hours' value={`${totalExtraHours} hours`} />
+                    <MyCard title='Penalty Hours' value={`${penaltyHours} hours`} />
                 </Col>
                 <Col xs={12} sm={6} md={3} className='mb-2'>
-                    <MyCard title='Adjustment Hours' value={`${adjustmentHours} hours`} />
+                    <MyCard title='Total Extra Hours' value={`${totalExtraHours} hours`} />
                 </Col>
+                {/* <Col xs={12} sm={6} md={3} className='mb-2'>
+                    <MyCard title='Adjustment Hours' value={`${adjustmentHours} hours`} />
+                </Col> */}
             </Row>
             <Row className='mb-4 d-none d-md-flex'>
                 <Col>
@@ -341,18 +353,19 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, mark
     const { date, isInactive } = day;
 
     const isFutureDay = date.isAfter(today, 'day');
-    const { inTime, outTime, shortHours, extraHours, totalTime, absent, reason, publicHoliday } = events?.[monthKey]?.[date.format('YYYY-MM-DD')] || {}
+    const { inTime, outTime, shortHours, extraHours, penalty, totalTime, absent, reason, publicHoliday } = events?.[monthKey]?.[date.format('YYYY-MM-DD')] || {}
+    console.log("🚀 ~ TdComponent ~ penalty:", penalty)
 
     const tdColor = shortHours ? 'bg-danger text-light' : extraHours ? 'bg-info  text-light' : (inTime && outTime) ? 'bg-success  text-light' : (inTime && !outTime) ? 'bg-warning text-light' : (absent || publicHoliday) ? 'bg-secondary text-light' : ''
 
-    const isDisabled = isSunday || isFutureDay || isInactive
+    const isDisabled = isSunday || isFutureDay || isInactive || disableEditing
 
     return (
         <td className={tdColor}>
             <div>
                 <div className='d-flex align-items-center justify-content-between gap-1'>
                     <p className='mb-0 fw-bold'>{date.format('D')}</p>
-                    <ConditionalTag condition={!isDisabled || !disableEditing}>
+                    <ConditionalTag condition={!isDisabled}>
                         <IconButton
                             sx='border-0'
                             sm
@@ -364,12 +377,12 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, mark
                 <ConditionalTag condition={!isDisabled}>
                     <ConditionalTag condition={!isEditable}>
                         <ConditionalTag condition={!absent && !publicHoliday}>
-                            <p className='mb-1'>In : {inTime || '--:--'}</p>
+                            <p className='mb-0'>In : {inTime || '--:--'}</p>
                             <p className='mb-0'>Out : {outTime || '--:--'}</p>
                         </ConditionalTag>
                         <ConditionalTag condition={shortHours}>
                             <p className='mb-0'>Short : {shortHours}</p>
-                        </ConditionalTag>
+                        </ConditionalTag>                        
                         <ConditionalTag condition={extraHours}>
                             <p className='mb-0'>Extra : {extraHours}</p>
                         </ConditionalTag>
@@ -385,19 +398,20 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, mark
                         <ConditionalTag condition={Object.keys(totalTime || {}).length}>
                             <p className='mb-0'>Total Time : {totalTime?.hours + ' Hours ' + totalTime?.minutes + ' Minutes'}</p>
                         </ConditionalTag>
+                        <ConditionalTag condition={penalty}>
+                            <p className='mb-0 bg-light text-danger text-center mt-2'>Penalty : {penalty} hour</p>
+                        </ConditionalTag>
                     </ConditionalTag>
                     <ConditionalTag condition={isEditable}>
                         <ConditionalTag condition={!absent && !publicHoliday}>
                             <InputField
                                 label='In'
                                 value={inTime || ''}
-                                // disabled={absent || publicHoliday}
                                 onChange={(e) => handleTimeChange(date.format('YYYY-MM-DD'), 'inTime', e.target.value)}
                             />
                             <InputField
                                 label='Out'
                                 value={outTime || ''}
-                                // disabled={absent || publicHoliday}
                                 onChange={(e) => handleTimeChange(date.format('YYYY-MM-DD'), 'outTime', e.target.value)}
                             />
                         </ConditionalTag>
