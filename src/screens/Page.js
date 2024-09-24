@@ -12,8 +12,11 @@ import { db } from '../fire';
 
 function Page() {
     const { state, dispatch } = useContext(AppContext);
-    const _cm = moment().date() >= 26 ? moment().subtract(1, 'month').format("MMMM-YYYY") : moment().format("MMMM-YYYY");
-    const [currentMonth, setCurrentMonth] = useState(moment().date() >= 26 ? moment().subtract(1, 'month') : moment());
+    const daysInMonth = moment().daysInMonth()
+    const startOfMonth = daysInMonth > 30 ? 26 : 25
+    const _cm = moment().date() >= startOfMonth ? moment().subtract(1, 'month').format("MMMM-YYYY") : moment().format("MMMM-YYYY");
+    const [currentMonth, setCurrentMonth] = useState(moment().date() >= startOfMonth ? moment().subtract(1, 'month') : moment());
+    const daysInCurrentMonth = currentMonth.clone().daysInMonth()
     const monthKey = currentMonth.clone().format('MMMM-YYYY')
     const [calendar, setCalendar] = React.useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -52,8 +55,8 @@ function Page() {
     };
 
     const generateCalendar = (month) => {
-        const startOfMonth = month.clone().subtract(1, 'month').date(26);
-        const endOfMonth = month.clone().date(25);
+        const startOfMonth = month.clone().subtract(1, 'month').date(daysInCurrentMonth > 30 ? 25 : 26);
+        const endOfMonth = month.clone().date(daysInCurrentMonth > 30 ? 25 : 24);
 
         let startDate = startOfMonth.clone().startOf('week');
         let endDate = endOfMonth.clone().endOf('week');
@@ -156,6 +159,7 @@ function Page() {
             }
         });
     }
+
     const handleReason = (date, text) => {
         const event = events?.[monthKey]?.[date] || {}
         dispatch({
@@ -236,7 +240,7 @@ function Page() {
         }
     };
 
-    const { totalHours, totalShortHours, totalExtraHours, adjustmentHours, penaltyHours } = calculateTotalHours();
+    const { totalHours, totalShortHours, totalExtraHours, penaltyHours } = calculateTotalHours();
 
     return (
         <Container fluid className='py-4'>
@@ -254,9 +258,6 @@ function Page() {
                 <Col xs={12} sm={6} md={3} className='mb-2'>
                     <MyCard title='Total Extra Hours' value={`${totalExtraHours} hours`} />
                 </Col>
-                {/* <Col xs={12} sm={6} md={3} className='mb-2'>
-                    <MyCard title='Adjustment Hours' value={`${adjustmentHours} hours`} />
-                </Col> */}
             </Row>
             <Row className='mb-4 d-none d-md-flex'>
                 <Col>
@@ -328,7 +329,6 @@ function Page() {
 
 export default Page;
 
-
 const MyItem = ({ title, color }) => {
     return <Badge bg={color}>
         {title}
@@ -354,7 +354,6 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, mark
 
     const isFutureDay = date.isAfter(today, 'day');
     const { inTime, outTime, shortHours, extraHours, penalty, totalTime, absent, reason, publicHoliday } = events?.[monthKey]?.[date.format('YYYY-MM-DD')] || {}
-    console.log("🚀 ~ TdComponent ~ penalty:", penalty)
 
     const tdColor = shortHours ? 'bg-danger text-light' : extraHours ? 'bg-info  text-light' : (inTime && outTime) ? 'bg-success  text-light' : (inTime && !outTime) ? 'bg-warning text-light' : (absent || publicHoliday) ? 'bg-secondary text-light' : ''
 
@@ -382,7 +381,7 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, mark
                         </ConditionalTag>
                         <ConditionalTag condition={shortHours}>
                             <p className='mb-0'>Short : {shortHours}</p>
-                        </ConditionalTag>                        
+                        </ConditionalTag>
                         <ConditionalTag condition={extraHours}>
                             <p className='mb-0'>Extra : {extraHours}</p>
                         </ConditionalTag>
