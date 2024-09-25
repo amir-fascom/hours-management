@@ -52,7 +52,7 @@ export const appReducer = (state, action) => {
         case INITIALIZE_EVENTS:
             return {
                 ...state,
-                events: action.payload
+                events: { ...state.events, ...action.payload }
             };
         case LOGIN:
             return {

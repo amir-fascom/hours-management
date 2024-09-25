@@ -7,7 +7,7 @@ function Header({ user, logout = () => { } }) {
     return (
         <header>
             <Container fluid className='pt-4'>
-                <Card>
+                <Card className='rounded-0'>
                     <Card.Body className='d-flex justify-content-end align-items-center gap-2'>
                         <p className='mb-0 fw-semibold fs-6'>{user.email}</p>
                         <PrimaryButton onClick={logout} title='LogOut' />
