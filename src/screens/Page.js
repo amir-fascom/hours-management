@@ -363,7 +363,7 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, mark
             <div>
                 <div className='d-flex align-items-center justify-content-between gap-1'>
                     <p className='mb-0 fw-bold'>{date.format('D')}</p>
-                    <ConditionalTag condition={!isDisabled && !disableEditing}>
+                    <ConditionalTag condition={!isDisabled}>
                         <IconButton
                             sx='border-0'
                             sm
