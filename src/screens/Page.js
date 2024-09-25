@@ -13,11 +13,15 @@ import { db } from '../fire';
 function Page() {
     const { state, dispatch } = useContext(AppContext);
     const daysInMonth = moment().daysInMonth()
+    console.log("🚀 ~ Page ~ daysInMonth:", daysInMonth)
     const startOfMonth = daysInMonth > 30 ? 26 : 25
-    const _cm = moment().date() >= startOfMonth ? moment().subtract(1, 'month').format("MMMM-YYYY") : moment().format("MMMM-YYYY");
-    const [currentMonth, setCurrentMonth] = useState(moment().date() >= startOfMonth ? moment().subtract(1, 'month') : moment());
+    console.log("🚀 ~ Page ~ startOfMonth:", startOfMonth)
+    const _cm = moment().date() >= startOfMonth ? moment().add(1, 'month').format("MMMM-YYYY") : moment().format("MMMM-YYYY");
+    console.log("🚀 ~ Page ~ _cm:", _cm)
+    const [currentMonth, setCurrentMonth] = useState(moment().date() >= startOfMonth ? moment().add(1, 'month') : moment());
     const daysInCurrentMonth = currentMonth.clone().daysInMonth()
     const monthKey = currentMonth.clone().format('MMMM-YYYY')
+    console.log("🚀 ~ Page ~ monthKey:", monthKey)
     const [calendar, setCalendar] = React.useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const { events, user } = state
@@ -357,14 +361,14 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, mark
 
     const tdColor = shortHours ? 'bg-danger text-light' : extraHours ? 'bg-info  text-light' : (inTime && outTime) ? 'bg-success  text-light' : (inTime && !outTime) ? 'bg-warning text-light' : (absent || publicHoliday) ? 'bg-secondary text-light' : ''
 
-    const isDisabled = isSunday || isFutureDay || isInactive || disableEditing
+    const isDisabled = isSunday || isFutureDay || isInactive
 
     return (
         <td className={tdColor}>
             <div>
                 <div className='d-flex align-items-center justify-content-between gap-1'>
                     <p className='mb-0 fw-bold'>{date.format('D')}</p>
-                    <ConditionalTag condition={!isDisabled}>
+                    <ConditionalTag condition={!isDisabled&&!disableEditing}>
                         <IconButton
                             sx='border-0'
                             sm
