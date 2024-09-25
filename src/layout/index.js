@@ -7,6 +7,7 @@ import { db } from '../fire';
 import { Header, PrimaryButton } from '../components';
 import { AppContext } from '../context';
 import { INITIALIZE_EVENTS, LOGIN, LOGIN_OUT } from '../reducer';
+import { getCurrentMonth } from '../helpers';
 
 function Layout({ children }) {
     const [isLoading, setIsLoading] = useState(true);
@@ -34,8 +35,7 @@ function Layout({ children }) {
         setIsLoading(true);
         try {
             // Get a reference to the collection
-            const currentMonth = moment().date() >= 26 ? moment() : moment().subtract(1, 'month')
-            const monthKey = currentMonth.clone().add(1, 'month').format('MMMM-YYYY')
+            const { monthKey } = getCurrentMonth()
             const docRef = doc(db, user.uid, monthKey);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {

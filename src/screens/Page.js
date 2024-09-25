@@ -9,19 +9,14 @@ import { Utils } from '../utils';
 import { CLEAR_EVENT, HANDLE_EVENT, INITIALIZE_EVENTS, MARK_ABSENT } from '../reducer';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../fire';
+import { getCurrentMonth } from '../helpers';
 
 function Page() {
     const { state, dispatch } = useContext(AppContext);
-    const daysInMonth = moment().daysInMonth()
-    console.log("🚀 ~ Page ~ daysInMonth:", daysInMonth)
-    const startOfMonth = daysInMonth > 30 ? 26 : 25
-    console.log("🚀 ~ Page ~ startOfMonth:", startOfMonth)
-    const _cm = moment().date() >= startOfMonth ? moment().add(1, 'month').format("MMMM-YYYY") : moment().format("MMMM-YYYY");
-    console.log("🚀 ~ Page ~ _cm:", _cm)
+    const { startOfMonth, currentMonth: _cm } = getCurrentMonth()
     const [currentMonth, setCurrentMonth] = useState(moment().date() >= startOfMonth ? moment().add(1, 'month') : moment());
     const daysInCurrentMonth = currentMonth.clone().daysInMonth()
     const monthKey = currentMonth.clone().format('MMMM-YYYY')
-    console.log("🚀 ~ Page ~ monthKey:", monthKey)
     const [calendar, setCalendar] = React.useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const { events, user } = state
@@ -368,7 +363,7 @@ const TdComponent = ({ monthKey, day, events, handleTimeChange, markAbsent, mark
             <div>
                 <div className='d-flex align-items-center justify-content-between gap-1'>
                     <p className='mb-0 fw-bold'>{date.format('D')}</p>
-                    <ConditionalTag condition={!isDisabled&&!disableEditing}>
+                    <ConditionalTag condition={!isDisabled && !disableEditing}>
                         <IconButton
                             sx='border-0'
                             sm
