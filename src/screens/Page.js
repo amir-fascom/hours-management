@@ -125,6 +125,21 @@ function Page() {
         });
     }
 
+    const handleNote = (date, text) => {
+        const event = events?.[monthKey]?.[date] || {}
+        dispatch({
+            type: HANDLE_EVENT,
+            payload: {
+                month: monthKey,
+                date,
+                event: {
+                    ...event,
+                    note: text
+                }
+            }
+        });
+    }
+
     const clearEvent = (date) => {
         dispatch({
             type: CLEAR_EVENT,
@@ -226,6 +241,7 @@ function Page() {
                                             markAbsent={markAbsent}
                                             markHoliday={markHoliday}
                                             handleReason={handleReason}
+                                            handleNote={handleNote}
                                             isLoading={isEventLoading}
                                         />
                                     ))}

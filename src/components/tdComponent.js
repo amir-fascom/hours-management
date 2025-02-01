@@ -17,6 +17,7 @@ const TdComponent = ({
     markAbsent,
     markHoliday,
     handleReason,
+    handleNote,
     isSunday,
     clearEvent,
     hideEditButton,
@@ -27,7 +28,7 @@ const TdComponent = ({
     const { date, isInactive } = day;
 
     const isFutureDay = date.isAfter(today, 'day');
-    const { inTime, outTime, shortHours, extraHours, penalty, totalTime, absent, reason, publicHoliday } = events?.[monthKey]?.[date.format('YYYY-MM-DD')] || {}
+    const { inTime, outTime, shortHours, extraHours, penalty, totalTime, absent, reason, note, publicHoliday } = events?.[monthKey]?.[date.format('YYYY-MM-DD')] || {}
 
     const tdColor = shortHours ? 'bg-danger text-light' : extraHours ? 'bg-info  text-light' : (inTime && outTime) ? 'bg-success  text-light' : (inTime && !outTime) ? 'bg-warning text-light' : (absent || publicHoliday) ? 'bg-secondary text-light' : ''
 
@@ -73,7 +74,10 @@ const TdComponent = ({
                                 <p className='mb-0'>Public Holiday : {publicHoliday}</p>
                             </ConditionalTag>
                             <ConditionalTag condition={reason}>
-                                <p className='mb-0'>{reason}</p>
+                                <p className='mb-0'>Reason : {reason}</p>
+                            </ConditionalTag>
+                            <ConditionalTag condition={note}>
+                                <p className='mb-0'>Note : {note}</p>
                             </ConditionalTag>
                             <ConditionalTag condition={Object.keys(totalTime || {}).length}>
                                 <p className='mb-0'>Total Time : {totalTime?.hours + ' Hours ' + totalTime?.minutes + ' Minutes'}</p>
@@ -93,6 +97,11 @@ const TdComponent = ({
                                     label='Out'
                                     value={outTime || ''}
                                     onChange={(e) => handleTimeChange(date.format('YYYY-MM-DD'), 'outTime', e.target.value)}
+                                />
+                                <TextArea
+                                    label="Note"
+                                    value={note || ''}
+                                    onChange={(e) => handleNote(date.format('YYYY-MM-DD'), e.target.value)}
                                 />
                             </ConditionalTag>
                             <CheckBox
