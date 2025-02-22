@@ -16,7 +16,6 @@ function Page() {
     const { startOfMonth, currentMonth: cm } = getCurrentMonth()
     const _cm = cm.format('MMMM-YYYY')
     const [currentMonth, setCurrentMonth] = useState(moment().date() >= startOfMonth ? moment().add(1, 'month') : moment());
-    const daysInCurrentMonth = currentMonth.clone().daysInMonth()
     const monthKey = currentMonth.clone().format('MMMM-YYYY')
     const [calendar, setCalendar] = React.useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +24,7 @@ function Page() {
     const ref = useRef(null)
 
     useEffect(() => {
-        generateCalendar(currentMonth, daysInCurrentMonth, setCalendar);
+        generateCalendar(currentMonth, setCalendar);
     }, [currentMonth]);
 
     useEffect(() => {

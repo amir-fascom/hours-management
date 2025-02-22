@@ -1,16 +1,15 @@
 import moment from "moment";
 
 export const getCurrentMonth = () => {
-    const daysInMonth = moment().daysInMonth()
-    const startOfMonth = daysInMonth > 30 ? 26 : 25
+    const startOfMonth = moment().startOf('month').subtract(6, 'days').date()
     const currentMonth = moment().date() >= startOfMonth ? moment().add(1, 'month') : moment();
     const monthKey = currentMonth.clone().format('MMMM-YYYY')
-    return { daysInMonth, startOfMonth, currentMonth, monthKey }
+    return { startOfMonth, currentMonth, monthKey }
 }
 
-export const generateCalendar = (month, daysInCurrentMonth, setCalendar) => {
-    const startOfMonth = month.clone().subtract(1, 'month').date(daysInCurrentMonth > 30 ? 25 : 26);
-    const endOfMonth = month.clone().date(daysInCurrentMonth > 30 ? 25 : 24);
+export const generateCalendar = (month, setCalendar) => {
+    const startOfMonth = month.clone().startOf('month').subtract(6, 'days');
+    const endOfMonth = month.clone().endOf('month').subtract(6, 'days');
 
     let startDate = startOfMonth.clone().startOf('week');
     let endDate = endOfMonth.clone().endOf('week');
