@@ -13,9 +13,9 @@ import { ToastContext } from '../context/toastContext';
 function Page() {
     const { state, dispatch } = useContext(AppContext);
     const { addToast } = useContext(ToastContext);
-    const { startOfMonth, currentMonth: cm } = getCurrentMonth()
-    const _cm = cm.format('MMMM-YYYY')
-    const [currentMonth, setCurrentMonth] = useState(moment().date() >= startOfMonth ? moment().add(1, 'month') : moment());
+    const { currentMonth: cm } = getCurrentMonth()
+    const _cm = cm.clone().format('MMMM-YYYY')
+    const [currentMonth, setCurrentMonth] = useState(cm);
     const monthKey = currentMonth.clone().format('MMMM-YYYY')
     const [calendar, setCalendar] = React.useState([]);
     const [isLoading, setIsLoading] = useState(false);
