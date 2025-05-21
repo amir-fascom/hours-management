@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Badge, Card, Col, Container, Row, Table } from 'react-bootstrap';
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import moment from 'moment';
 import { IconButton, PrimaryButton, StatsArea, TdComponent } from '../components';
 import { CLEAR_EVENT, HANDLE_EVENT, INITIALIZE_EVENTS, MARK_ABSENT } from '../reducer';
 import { db } from '../fire';
@@ -173,7 +172,7 @@ function Page() {
             <StatsArea events={events} monthKey={monthKey} />
             <Row className='mb-4 d-none d-md-flex'>
                 <Col>
-                    <Card className='rounded-0'>
+                    <Card className='rounded-1 bg_fr border-0'>
                         <Card.Body>
                             <div className='d-flex align-items-center justify-content-center gap-3'>
                                 <Badge bg='success'>
@@ -199,7 +198,7 @@ function Page() {
             {/* month */}
             <Row className='mb-4'>
                 <Col>
-                    <Card className='rounded-0'>
+                    <Card className='rounded-1 bg_fr border-0 text_light'>
                         <Card.Body>
                             <div className='d-flex align-items-center justify-content-center gap-2'>
                                 <IconButton onClick={goToPreviousMonth} title='Previous Month' icon={<MdKeyboardArrowLeft />} sx='border-0' />
@@ -214,11 +213,11 @@ function Page() {
             {/* calender */}
             <Row className='mb-4'>
                 <Col>
-                    <Table striped bordered responsive style={{ minWidth: '1200px' }}>
+                    <Table hover borderless responsive style={{ minWidth: '1200px' }}>
                         <thead>
                             <tr>
                                 {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day) => (
-                                    <th key={day} className='my_grid_item' style={{ width: window.innerWidth / 7 }}>
+                                    <th key={day} className='bg_fr text_light' style={{ width: window.innerWidth / 7 }}>
                                         {day}
                                     </th>
                                 ))}
@@ -252,7 +251,7 @@ function Page() {
             </Row>
             <Row>
                 <Col>
-                    <Card className='rounded-0'>
+                    <Card className='rounded-1 border-0 bg_fr'>
                         <Card.Body>
                             <PrimaryButton title='Save Event' isLoading={isLoading} sx='ms-auto d-block' onClick={saveEventToDB} />
                         </Card.Body>

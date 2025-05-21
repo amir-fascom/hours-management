@@ -30,12 +30,12 @@ const TdComponent = ({
     const isFutureDay = date.isAfter(today, 'day');
     const { inTime, outTime, shortHours, extraHours, penalty, totalTime, absent, reason, note, publicHoliday } = events?.[monthKey]?.[date.format('YYYY-MM-DD')] || {}
 
-    const tdColor = shortHours ? 'bg-danger text-light' : extraHours ? 'bg-info  text-light' : (inTime && outTime) ? 'bg-success  text-light' : (inTime && !outTime) ? 'bg-warning text-light' : (absent || publicHoliday) ? 'bg-secondary text-light' : ''
+    const tdColor = shortHours ? 'bg-danger' : extraHours ? 'bg-info ' : (inTime && outTime) ? 'bg-success ' : (inTime && !outTime) ? 'bg-warning' : (absent || publicHoliday) ? 'bg-secondary' : 'bg_fr'
 
     const isDisabled = isSunday || isFutureDay || isInactive
 
     return (
-        <td className={tdColor}>
+        <td className={"text_light " + tdColor}>
             <div>
                 <div className='d-flex align-items-center justify-content-between gap-1'>
                     <p className='mb-0 fw-bold'>{date.format('D')}</p>

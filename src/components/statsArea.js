@@ -17,9 +17,9 @@ const StatsArea = ({ events, monthKey }) => {
             <Col xs={12} sm={6} md={3} className='mb-2'>
                 <MyCard title='Total Extra Hours' value={`${totalExtraHours} hours`} />
             </Col>
-            <Col xs={12} sm={12} md={12} className='mb-2'>
-                <MyCard title='Net Short Hours (3 hours adj included)' value={`${netShortHours > 0 ? netShortHours : 0} hours`} />
-            </Col>
+            {netShortHours > 0?<Col xs={12} sm={12} md={12} className='mb-2'>
+                <MyCard title='Net Short Hours (3 hours adj included)' value={`${netShortHours} hours`} />
+            </Col>:null}
         </Row>
     );
 }
@@ -28,9 +28,9 @@ export default StatsArea;
 
 const MyCard = ({ title, value }) => {
     return (
-        <Card className='rounded-0'>
+        <Card className='rounded-1 bg_fr border-0 text_light'>
             <Card.Body className='text-center' >
-                <h5 className='border-bottom border-secondary pb-2'>{title}</h5>
+                <h5 className='border-bottom border-light pb-2'>{title}</h5>
                 <h5>{value}</h5>
             </Card.Body>
         </Card>

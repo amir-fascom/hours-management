@@ -8,6 +8,7 @@ import PrimaryButton from "./primaryButton";
 import StatsArea from "./statsArea";
 import TdComponent from "./tdComponent";
 import TextArea from "./textArea";
+import ThemeSelector from "./themeSelector";
 import Toast from "./toast";
 
 export {
@@ -21,5 +22,6 @@ export {
     TextArea,
     StatsArea,
     Toast,
-    AuthContainer
+    AuthContainer,
+    ThemeSelector
 }

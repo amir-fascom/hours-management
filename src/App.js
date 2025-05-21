@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import Page from './screens/Page';
 import Layout from './layout';
-import { Toast } from './components';
+import { ThemeSelector, Toast } from './components';
 
 function App() {
   return (
@@ -11,6 +11,7 @@ function App() {
         <Page />
       </Layout>
       <Toast />
+      <ThemeSelector />
     </>
   );
 }

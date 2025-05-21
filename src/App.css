@@ -1,8 +1,90 @@
-body {
-    background-color: #ccc;
+:root {
+    --background-color: #1c1c1c;
+    --foreground-color: #071E22;
+    --primary-color: #F2542D;
+    --heading-color: #f8f9fa;
+    --text-color: #ffffff;
+    --text-dark-color: #212529;
+    --shadow-color: rgba(248, 249, 250, 0.233);
 }
 
-.loader_container{
+body.themeV1 {
+    --background-color: #1c1c1c;
+    --foreground-color: #071E22;
+    --primary-color: #F2542D;
+    --heading-color: #f8f9fa;
+    --text-color: #ffffff;
+    --text-dark-color: #212529;
+    --shadow-color: rgba(248, 249, 250, 0.233);
+}
+
+body.themeV2 {
+    --background-color: #1c1c1c;
+    --foreground-color: #264653;
+    --primary-color: #071E22;
+    --heading-color: #f8f9fa;
+    --text-color: #ffffff;
+    --text-dark-color: #212529;
+    --shadow-color: rgba(248, 249, 250, 0.233);
+}
+
+body.themeV3 {
+    --background-color: #1c1c1c;
+    --foreground-color: #212529;
+    --primary-color: #1c1c1c;
+    --heading-color: #f8f9fa;
+    --text-color: #ffffff;
+    --text-dark-color: #212529;
+    --shadow-color: rgba(248, 249, 250, 0.233);
+}
+
+body.themeV4 {
+    --background-color: #1c1c1c;
+    --foreground-color: #212529;
+    --primary-color: #fd650d;
+    --heading-color: #f8f9fa;
+    --text-color: #ffffff;
+    --text-dark-color: #212529;
+    --shadow-color: rgba(248, 249, 250, 0.233);
+}
+
+body {
+    background-color: var(--primary-color);
+}
+
+.bg_fr {
+    background-color: var(--foreground-color) !important;
+}
+
+.bg_primary {
+    background-color: var(--primary-color);
+}
+
+.text_primary {
+    color: var(--primary-color);
+}
+
+.text_light {
+    color: var(--text-color) !important;
+}
+
+.text_dark {
+    color: var(--text-dark-color);
+}
+
+.hover {
+    transition: 0.2s all ease-in-out;
+}
+
+.hover:hover {
+    color: var(--text-color);
+}
+
+.shadow_main {
+    box-shadow: 0px 0px 10px 0 var(--primary-color);
+}
+
+.loader_container {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -37,8 +119,54 @@ body {
     animation-timing-function: linear
 }
 
+table tr th {
+    border: 1px #fff;
+    border-style: none solid none none;
+}
+
+table tr th:first-child {
+    border-top-left-radius: 5px;
+}
+
+table tr th:last-child {
+    border-top-right-radius: 5px;
+    border-style: none;
+}
+
+table tr td {
+    border: solid 1px #fff;
+}
+
+table tr td:first-child {
+    border-style: solid solid solid none;
+}
+
+table tr td:last-child {
+    border-style: solid none solid solid;
+}
+
+table tr:last-child td:first-child {
+    border-bottom-left-radius: 5px;
+}
+
+table tr:last-child td:last-child {
+    border-bottom-right-radius: 5px;
+}
+
 @keyframes l12 {
     100% {
         transform: rotate(.5turn)
     }
+}
+
+/* overrides */
+input.form-control:focus,
+input.form-check-input:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
 }

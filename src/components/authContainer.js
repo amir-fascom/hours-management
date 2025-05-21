@@ -2,7 +2,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "fire
 import PrimaryButton from "./primaryButton";
 import { useContext, useState } from "react";
 import { ToastContext } from "../context/toastContext";
-import { Container, Form } from "react-bootstrap";
+import { Form, Stack } from "react-bootstrap";
 import { LOGIN } from "../reducer";
 
 const AuthContainer = ({ auth, dispatch }) => {
@@ -47,9 +47,9 @@ const AuthContainer = ({ auth, dispatch }) => {
     }
 
     return (
-        <Container fluid style={{ minHeight: '100vh' }}>
-            <Form onSubmit={handleSubmit} className='mx-auto px-2 py-4 bg-light shadow mt-2' style={{ maxWidth: '550px' }}>
-                <p className='fs-5 fw-semibold text-center mb-4'>Hours Management System</p>
+        <Stack className="align-item-center p-2 justify-content-center" style={{ minHeight: '100vh' }}>
+            <Form onSubmit={handleSubmit} className='mx-auto bg_fr px-4 py-5 rounded-1' style={{ width: "100%", maxWidth: '600px' }}>
+                <p className='fs-3 fw-semibold text_light text-center mb-4'>Hours Management System</p>
                 <div className='d-flex align-items-center justify-content-center mb-3 gap-2'>
                     <Form.Check
                         inline
@@ -57,6 +57,7 @@ const AuthContainer = ({ auth, dispatch }) => {
                         name="group1"
                         type='radio'
                         id='login'
+                        className="text_light"
                         checked={isLogin}
                         onChange={() => setIsLogin(true)}
                     />
@@ -66,21 +67,22 @@ const AuthContainer = ({ auth, dispatch }) => {
                         name="group1"
                         type='radio'
                         id='register'
+                        className="text_light"
                         checked={!isLogin}
                         onChange={() => setIsLogin(false)}
                     />
                 </div>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Control type="email" required placeholder="Enter email" className='border-secondary rounded-0' value={email} onChange={e => setEmail(e.target.value)} />
+                <Form.Group className="mb-2" controlId="formBasicEmail">
+                    <Form.Control type="email" required placeholder="Enter email" className='border-secondary rounded-1' value={email} onChange={e => setEmail(e.target.value)} />
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Control type="password" required placeholder="Password" className='border-secondary rounded-0' value={password} onChange={e => setPassword(e.target.value)} />
+                <Form.Group className="mb-4" controlId="formBasicPassword">
+                    <Form.Control type="password" required placeholder="Password" className='border-secondary rounded-1' value={password} onChange={e => setPassword(e.target.value)} />
                 </Form.Group>
-                <div className='d-flex align-items-end justify-content-end'>
-                    <PrimaryButton isLoading={isLoading} type='submit' title={isLogin ? 'Login' : 'Register'} />
+                <div className='d-flex align-items-center justify-content-center'>
+                    <PrimaryButton isLoading={isLoading} sx='w-25' type='submit' title={isLogin ? 'Login' : 'Register'} />
                 </div>
             </Form>
-        </Container>
+        </Stack >
     )
 }
 
