@@ -18,6 +18,7 @@ const TdComponent = ({
     markHoliday,
     handleReason,
     handleNote,
+    theme,
     isSunday,
     clearEvent,
     hideEditButton,
@@ -35,7 +36,7 @@ const TdComponent = ({
     const isDisabled = isSunday || isFutureDay || isInactive
 
     return (
-        <td className={"text_light " + tdColor}>
+        <td className={`${!!theme ? 'text_light' : 'text-light'} ${tdColor}`}>
             <div>
                 <div className='d-flex align-items-center justify-content-between gap-1'>
                     <p className='mb-0 fw-bold'>{date.format('D')}</p>

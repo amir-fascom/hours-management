@@ -169,7 +169,7 @@ function Page() {
     return (
         <Container fluid className='py-4'>
             {/* stats */}
-            <StatsArea events={events} monthKey={monthKey} />
+            <StatsArea events={events} theme={state.theme} monthKey={monthKey} />
             <Row className='mb-4 d-none d-md-flex'>
                 <Col>
                     <Card className='rounded-1 bg_fr border-0'>
@@ -233,6 +233,7 @@ function Page() {
                                             hideEditButton={_cm !== monthKey}
                                             monthKey={monthKey}
                                             events={events}
+                                            theme={state.theme}
                                             handleTimeChange={handleTimeChange}
                                             isSunday={idx === 0}
                                             clearEvent={clearEvent}

@@ -1,51 +1,36 @@
 :root {
-    --background-color: #1c1c1c;
-    --foreground-color: #071E22;
-    --primary-color: #F2542D;
-    --heading-color: #f8f9fa;
-    --text-color: #ffffff;
-    --text-dark-color: #212529;
-    --shadow-color: rgba(248, 249, 250, 0.233);
+    --foreground-color: #FFFFFF;
+    --primary-color: #CCCCCC;
+    --text-color: #333333;
+    --table-border: #cccccc;
 }
 
 body.themeV1 {
-    --background-color: #1c1c1c;
     --foreground-color: #071E22;
     --primary-color: #F2542D;
-    --heading-color: #f8f9fa;
     --text-color: #ffffff;
-    --text-dark-color: #212529;
-    --shadow-color: rgba(248, 249, 250, 0.233);
+    --table-border: #ffffff;
 }
 
 body.themeV2 {
-    --background-color: #1c1c1c;
     --foreground-color: #264653;
     --primary-color: #071E22;
-    --heading-color: #f8f9fa;
     --text-color: #ffffff;
-    --text-dark-color: #212529;
-    --shadow-color: rgba(248, 249, 250, 0.233);
+    --table-border: #ffffff;
 }
 
 body.themeV3 {
-    --background-color: #1c1c1c;
     --foreground-color: #212529;
     --primary-color: #1c1c1c;
-    --heading-color: #f8f9fa;
     --text-color: #ffffff;
-    --text-dark-color: #212529;
-    --shadow-color: rgba(248, 249, 250, 0.233);
+    --table-border: #ffffff;
 }
 
 body.themeV4 {
-    --background-color: #1c1c1c;
     --foreground-color: #212529;
     --primary-color: #fd650d;
-    --heading-color: #f8f9fa;
     --text-color: #ffffff;
-    --text-dark-color: #212529;
-    --shadow-color: rgba(248, 249, 250, 0.233);
+    --table-border: #ffffff;
 }
 
 body {
@@ -66,10 +51,6 @@ body {
 
 .text_light {
     color: var(--text-color) !important;
-}
-
-.text_dark {
-    color: var(--text-dark-color);
 }
 
 .hover {
@@ -120,7 +101,7 @@ body {
 }
 
 table tr th {
-    border: 1px #fff;
+    border: 1px var(--table-border);
     border-style: none solid none none;
 }
 
@@ -134,7 +115,7 @@ table tr th:last-child {
 }
 
 table tr td {
-    border: solid 1px #fff;
+    border: solid 1px var(--table-border);
 }
 
 table tr td:first-child {

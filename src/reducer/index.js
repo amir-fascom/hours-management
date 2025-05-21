@@ -12,7 +12,7 @@ export const THEME = 'THEME';
 export const initialState = {
     events: {}, // Store events as key-value pairs where the key is the date
     user: {},
-    theme: localStorage.getItem('dashboard-theme') || themeVariations.v1,
+    theme: localStorage.getItem('dashboard-theme') || '',
     isLogged: false
 };
 

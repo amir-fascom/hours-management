@@ -18,6 +18,8 @@ function ThemeSelector() {
             </div>
             <Modal show={open} onHide={handleClose}>
                 <Modal.Body className='bg_fr'>
+                    <ColorGroup theme='' label='Default' active={state.theme} color1='#FFFFFF' color2='#CCCCCC' color3='#333333' dispatch={dispatch} />
+                    <br />
                     <ColorGroup theme={themeVariations.v1} label='Variation 1' active={state.theme} color1='#071E22' color2='#F2542D' color3='#ffffff' dispatch={dispatch} />
                     <br />
                     <ColorGroup theme={themeVariations.v2} label='Variation 2' active={state.theme} color1='#264653' color2='#071E22' color3='#ffffff' dispatch={dispatch} />
@@ -30,6 +32,7 @@ function ThemeSelector() {
 }
 
 const ColorGroup = ({ theme, active, label, color1, color2, color3, dispatch }) => {
+    const isDefault = active === ''
     return (
         <div>
             <Form.Check
@@ -47,7 +50,7 @@ const ColorGroup = ({ theme, active, label, color1, color2, color3, dispatch }) 
                     })
                 }
             />
-            <div className='d-flex w-100' style={{ border: '1px solid #fff' }}>
+            <div className='d-flex w-100' style={{ border: isDefault ? '1px solid #333' : '1px solid #fff' }}>
                 <div style={{ backgroundColor: color1, width: "100%", height: "50px" }} className='w-100'></div>
                 <div style={{ backgroundColor: color2, width: "100%", height: "50px" }} className='w-100'></div>
                 <div style={{ backgroundColor: color3, width: "100%", height: "50px" }} className='w-100'></div>
