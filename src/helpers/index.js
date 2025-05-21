@@ -110,5 +110,7 @@ export const calculateTotalHours = (events, monthKey) => {
         }
     });
 
-    return { totalHours, totalShortHours, totalExtraHours, penaltyHours };
+    const netShortHours = (penaltyHours + totalShortHours) - (totalExtraHours + 3)
+
+    return { totalHours, totalShortHours, totalExtraHours, penaltyHours, netShortHours };
 };

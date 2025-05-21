@@ -2,7 +2,7 @@ import { Card, Col, Row } from "react-bootstrap";
 import { calculateTotalHours } from "../helpers";
 
 const StatsArea = ({ events, monthKey }) => {
-    const { totalHours, totalShortHours, totalExtraHours, penaltyHours } = calculateTotalHours(events, monthKey);
+    const { totalHours, totalShortHours, totalExtraHours, penaltyHours, netShortHours } = calculateTotalHours(events, monthKey);
     return (
         <Row className='mb-2'>
             <Col xs={12} sm={6} md={3} className='mb-2'>
@@ -16,6 +16,9 @@ const StatsArea = ({ events, monthKey }) => {
             </Col>
             <Col xs={12} sm={6} md={3} className='mb-2'>
                 <MyCard title='Total Extra Hours' value={`${totalExtraHours} hours`} />
+            </Col>
+            <Col xs={12} sm={12} md={12} className='mb-2'>
+                <MyCard title='Net Short Hours (3 hours adj included)' value={`${netShortHours > 0 ? netShortHours : 0} hours`} />
             </Col>
         </Row>
     );
