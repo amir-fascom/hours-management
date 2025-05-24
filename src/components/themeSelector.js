@@ -1,10 +1,62 @@
-import { useContext, useState } from 'react';
-import { IoIosColorPalette } from "react-icons/io";
-import { Form, Modal } from 'react-bootstrap';
+import { Fragment, useContext, useState } from 'react';
+import { IoIosColorPalette, IoMdCheckmark } from "react-icons/io";
+import { Modal } from 'react-bootstrap';
 import { themeVariations } from '../helpers/constants';
 import { THEME } from '../reducer';
 import { AppContext } from '../context';
 import IconButton from './iconButton';
+
+const data = [
+    {
+        theme: '',
+        label: 'Default',
+        color1: '#FFFFFF',
+        color2: '#CCCCCC',
+        color3: '#333333'
+    },
+    {
+        theme: themeVariations.v1,
+        label: 'Variation 1',
+        color1: '#F2542D',
+        color2: '#071E22',
+        color3: '#ffffff'
+    },
+    {
+        theme: themeVariations.v2,
+        label: 'Variation 2',
+        color1: '#071E22',
+        color2: '#264653',
+        color3: '#ffffff'
+    },
+    {
+        theme: themeVariations.v3,
+        label: 'Variation 3',
+        color1: '#111',
+        color2: '#212529',
+        color3: '#ffffff'
+    },
+    {
+        theme: themeVariations.v4,
+        label: 'Variation 4',
+        color1: '#3B373B',
+        color2: '#656E77',
+        color3: '#ffffff'
+    },
+    {
+        theme: themeVariations.v5,
+        label: 'Variation 5',
+        color1: '#333446',
+        color2: '#7F8CAA',
+        color3: '#ffffff'
+    },
+    {
+        theme: themeVariations.v6,
+        label: 'Variation 6',
+        color1: '#547792',
+        color2: '#213448',
+        color3: '#ffffff'
+    },
+]
 
 function ThemeSelector() {
     const { state, dispatch } = useContext(AppContext);
@@ -14,17 +66,19 @@ function ThemeSelector() {
     return (
         <>
             <div>
-                <IconButton onClick={() => setOpen(true)} icon={<IoIosColorPalette />} sx='border-0 bg_fr position-fixed bottom-0 end-0 me-2 mb-3' />
+                <IconButton lg onClick={() => setOpen(true)} icon={<IoIosColorPalette size={25} />} sx='border-0 bg_fr position-fixed bottom-0 end-0 me-2 mb-3' />
             </div>
             <Modal show={open} onHide={handleClose}>
                 <Modal.Body className='bg_fr'>
-                    <ColorGroup theme='' label='Default' active={state.theme} color1='#FFFFFF' color2='#CCCCCC' color3='#333333' dispatch={dispatch} />
-                    <br />
-                    <ColorGroup theme={themeVariations.v1} label='Variation 1' active={state.theme} color1='#071E22' color2='#F2542D' color3='#ffffff' dispatch={dispatch} />
-                    <br />
-                    <ColorGroup theme={themeVariations.v2} label='Variation 2' active={state.theme} color1='#264653' color2='#071E22' color3='#ffffff' dispatch={dispatch} />
-                    <br />
-                    <ColorGroup theme={themeVariations.v3} label='Variation 3' active={state.theme} color1='#212529' color2='#1c1c1c' color3='#ffffff' dispatch={dispatch} />
+                    {data.map((item, index) => {
+                        return (
+                            <Fragment key={index}>
+                                <ColorGroup {...item} active={state.theme} dispatch={dispatch} />
+                                {data.length - 1 === index ? null : <br />}
+                            </Fragment>
+                        )
+                    })
+                    }
                 </Modal.Body>
             </Modal>
         </>
@@ -34,22 +88,17 @@ function ThemeSelector() {
 const ColorGroup = ({ theme, active, label, color1, color2, color3, dispatch }) => {
     const isDefault = active === ''
     return (
-        <div>
-            <Form.Check
-                inline
-                label={label}
-                name={theme}
-                type='radio'
-                id={theme}
-                checked={theme === active}
-                className='text_light'
-                onChange={() =>
-                    dispatch({
-                        type: THEME,
-                        payload: { theme }
-                    })
-                }
-            />
+        <div onClick={() =>
+            dispatch({
+                type: THEME,
+                payload: { theme }
+            })
+        }
+            style={{ cursor: 'pointer' }}
+        >
+            <p className='text_light'>
+                {label} {theme === active ? <IoMdCheckmark size={16} /> : null}
+            </p>
             <div className='d-flex w-100' style={{ border: isDefault ? '1px solid #333' : '1px solid #fff' }}>
                 <div style={{ backgroundColor: color1, width: "100%", height: "50px" }} className='w-100'></div>
                 <div style={{ backgroundColor: color2, width: "100%", height: "50px" }} className='w-100'></div>

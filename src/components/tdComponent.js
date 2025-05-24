@@ -39,7 +39,7 @@ const TdComponent = ({
         <td className={`${!!theme ? 'text_light' : 'text-light'} ${tdColor}`}>
             <div>
                 <div className='d-flex align-items-center justify-content-between gap-1'>
-                    <p className='mb-0 fw-bold'>{date.format('D')}</p>
+                    <p className={`mb-0 fw-bold ${theme==='' && tdColor === 'bg_fr' ? 'text-dark' : ''}`}>{date.format('D')}</p>
                     <ConditionalTag condition={!isDisabled && !hideEditButton}>
                         <IconButton
                             sx='border-0'
