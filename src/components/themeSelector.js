@@ -73,7 +73,7 @@ function ThemeSelector() {
                     {data.map((item, index) => {
                         return (
                             <Fragment key={index}>
-                                <ColorGroup {...item} active={state.theme} dispatch={dispatch} />
+                                <ColorGroup {...item} active={state.theme} dispatch={dispatch} handleClose={handleClose} />
                                 {data.length - 1 === index ? null : <br />}
                             </Fragment>
                         )
@@ -85,15 +85,16 @@ function ThemeSelector() {
     );
 }
 
-const ColorGroup = ({ theme, active, label, color1, color2, color3, dispatch }) => {
+const ColorGroup = ({ theme, active, label, color1, color2, color3, dispatch, handleClose }) => {
     const isDefault = active === ''
     return (
-        <div onClick={() =>
+        <div onClick={() => {
             dispatch({
                 type: THEME,
                 payload: { theme }
             })
-        }
+            handleClose()
+        }}
             style={{ cursor: 'pointer' }}
         >
             <p className='text_light'>
